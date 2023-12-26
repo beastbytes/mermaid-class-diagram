@@ -62,7 +62,7 @@ test('Method with return type', function () {
 
 test('Method with everything', function () {
     $method = new Method(
-        name: NAME,
+        name:       NAME,
         parameters: ['string $string', 'bool $bool', 'int $int'],
         returnType: 'string',
         visibility: Visibility::Public

@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace BeastBytes\Mermaid\ClassDiagram;
 
-enum VisibilityEnum: string
+enum Visibility: string
 {
     case Public = '+';
     case Private = '-';

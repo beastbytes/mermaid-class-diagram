@@ -51,8 +51,8 @@ test('Method with type', function () {
 
 test('Attribute with everything', function () {
     $method = new Attribute(
-        name:NAME,
-        type: 'string',
+        name:       NAME,
+        type:       'string',
         visibility: Visibility::Public
     );
 

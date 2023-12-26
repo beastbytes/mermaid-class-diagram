@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace BeastBytes\Mermaid\ClassDiagram;
 
-enum RelationshipEnum: string
+enum RelationshipType: string
 {
     case Aggregation = '--o';
     case Association = '-->';

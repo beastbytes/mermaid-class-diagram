@@ -18,7 +18,7 @@ class Classs implements MemberInterface
     private const BEGIN_CLASS = '%s%s %s%s {';
     private const END_CLASS = '%s}';
     private const LABEL = '["%s"]';
-    private const NOTE = 'note for %s "%s"';
+    private const NOTE = '%snote for %s "%s"';
     private const TYPE = 'class';
 
     private array $members = [];
@@ -37,15 +37,9 @@ class Classs implements MemberInterface
         return $this->name;
     }
 
-    public function attribute(Attribute $attribute): self
+    public function member(Attribute|Method $member): self
     {
-        $this->members[] = $attribute;
-        return $this;
-    }
-
-    public function method(Method $method): self
-    {
-        $this->members[] = $method;
+        $this->members[] = $member;
         return $this;
     }
 
@@ -62,7 +56,10 @@ class Classs implements MemberInterface
         );
 
         if ($this->annotation !== '') {
-            $output[] = sprintf(self::ANNOTATION, $indentation, $this->annotation);
+            $output[] = sprintf(
+                self::ANNOTATION,
+                $indentation . Mermaid::INDENTATION, $this->annotation
+            );
         }
 
         foreach ($this->members as $member) {
@@ -72,7 +69,7 @@ class Classs implements MemberInterface
         $output[] = sprintf(self::END_CLASS, $indentation);
 
         if ($this->note !== '') {
-            $output[] = sprintf(self::NOTE, $this->name, $this->note);
+            $output[] = sprintf(self::NOTE, $indentation, $this->name, $this->note);
         }
 
         return implode("\n", $output);

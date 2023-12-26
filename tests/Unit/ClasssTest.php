@@ -9,7 +9,7 @@ declare(strict_types=1);
 use BeastBytes\Mermaid\ClassDiagram\Attribute;
 use BeastBytes\Mermaid\ClassDiagram\Classs;
 use BeastBytes\Mermaid\ClassDiagram\Method;
-use BeastBytes\Mermaid\ClassDiagram\VisibilityEnum;
+use BeastBytes\Mermaid\ClassDiagram\Visibility;
 use BeastBytes\Mermaid\Mermaid;
 
 const ANNOTATION = 'Annotation';
@@ -77,14 +77,14 @@ test('Class with members', function () {
 
     $class
         ->member(new Attribute(
-            name: ATTRIBUTE_NAME,
-            type: 'string',
-            visibility: VisibilityEnum::Private
+            name:       ATTRIBUTE_NAME,
+            type:       'string',
+            visibility: Visibility::Private
         ))
         ->member(new Method(
-            name: METHOD_NAME,
+            name:       METHOD_NAME,
             returnType: 'string',
-            visibility: VisibilityEnum::Public
+            visibility: Visibility::Public
         ))
     ;
 
@@ -107,14 +107,14 @@ test('Class with everything', function () {
 
     $class
         ->member(new Attribute(
-            name: ATTRIBUTE_NAME,
-            type: 'string',
-            visibility: VisibilityEnum::Private
+            name:       ATTRIBUTE_NAME,
+            type:       'string',
+            visibility: Visibility::Private
         ))
         ->member(new Method(
-            name: METHOD_NAME,
+            name:       METHOD_NAME,
             returnType: 'string',
-            visibility: VisibilityEnum::Public
+            visibility: Visibility::Public
         ))
     ;
 

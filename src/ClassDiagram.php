@@ -14,10 +14,11 @@ use Stringable;
 
 class ClassDiagram implements MermaidInterface, Stringable
 {
-    private const NAMESPACE = "namespace %s {\n%s\n}";
-    private const NOTE = 'note "%s"';
-    private const STYLE_CLASS = 'cssClass, "%s" %s';
-    private const TITLE_DELIMITER = '---';
+    private const DEFAULT_NAMESPACE = 'default';
+    private const NAMESPACE = "%snamespace %s {\n%s\n%s}";
+    private const NOTE = '%snote "%s"';
+    private const STYLE_CLASS = '%scssClass "%s" %s';
+    public const TITLE_DELIMITER = '---';
     private const TYPE = 'classDiagram';
 
     private array $classes = [];
@@ -25,9 +26,8 @@ class ClassDiagram implements MermaidInterface, Stringable
     private array $styleClasses = [];
 
     public function __construct(
-        private readonly string $namespace = '',
-        private readonly string $note = '',
         private readonly string $title = '',
+        private readonly string $note = '',
     )
     {
     }
@@ -37,9 +37,9 @@ class ClassDiagram implements MermaidInterface, Stringable
         return $this->render();
     }
 
-    public function class(Classs $class): self
+    public function class(Classs $class, string $namespace = self::DEFAULT_NAMESPACE): self
     {
-        $this->classes[] = $class;
+        $this->classes[$namespace][] = $class;
         return $this;
     }
 
@@ -71,15 +71,28 @@ class ClassDiagram implements MermaidInterface, Stringable
 
         $output[] = self::TYPE;
 
-        $classes = [];
-        foreach ($this->classes as $class) {
-            $classes[] = $class->render(Mermaid::INDENTATION);
-        }
+        foreach ($this->classes as $namespace => $namespacedClasses) {
+            $classes = [];
+            $indentation = $namespace === self::DEFAULT_NAMESPACE
+                ? Mermaid::INDENTATION
+                : str_repeat(Mermaid::INDENTATION, 2)
+            ;
 
-        if ($this->namespace !== '') {
-            $output[] = sprintf(self::NAMESPACE, $this->namespace, implode("\n", $classes));
-        } else {
-            $output[] = implode("\n", $classes);
+            foreach ($namespacedClasses as $namespacedClass) {
+                $classes[] = $namespacedClass->render($indentation);
+            }
+
+            if ($namespace === self::DEFAULT_NAMESPACE) {
+                $output[] = implode("\n", $classes);
+            } else {
+                $output[] = sprintf(
+                    self::NAMESPACE,
+                    Mermaid::INDENTATION,
+                    $namespace,
+                    implode("\n", $classes),
+                    Mermaid::INDENTATION
+                );
+            }
         }
 
         foreach ($this->relationships as $relationship) {
@@ -87,11 +100,16 @@ class ClassDiagram implements MermaidInterface, Stringable
         }
 
         foreach ($this->styleClasses as $styleClass => $classes) {
-            $output[] = sprintf(self::STYLE_CLASS, implode(',', $classes) , $styleClass);
+            $output[] = sprintf(
+                self::STYLE_CLASS,
+                Mermaid::INDENTATION,
+                implode(',', $classes),
+                $styleClass
+            );
         }
 
         if ($this->note !== '') {
-            $output[] = sprintf(self::NOTE, $this->note);
+            $output[] = sprintf(self::NOTE, Mermaid::INDENTATION, $this->note);
         }
 
         return Mermaid::render(implode("\n", $output));

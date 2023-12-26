@@ -1,5 +1,5 @@
 # Mermaid Class Diagram
-PHP for the [Mermaid.js](https://mermaid.js.org/) diagramming and charting tool.
+PHP for [Mermaid.js](https://mermaid.js.org/) diagramming and charting tool class diagram.
 
 For license information see the [LICENSE](LICENSE.md) file.
 

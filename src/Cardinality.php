@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace BeastBytes\Mermaid\ClassDiagram;
 
-enum CardinalityEnum: string
+enum Cardinality: string
 {
     case Many = '*';
     case N = 'n';
