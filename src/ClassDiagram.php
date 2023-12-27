@@ -21,8 +21,11 @@ class ClassDiagram implements MermaidInterface, Stringable
     public const TITLE_DELIMITER = '---';
     private const TYPE = 'classDiagram';
 
+    /** @var array<string, Classs[]> */
     private array $classes = [];
+    /** @var Relationship[] */
     private array $relationships = [];
+    /** @var array<string, string> */
     private array $styleClasses = [];
 
     public function __construct(
@@ -43,13 +46,14 @@ class ClassDiagram implements MermaidInterface, Stringable
         return $this;
     }
 
+    /* @psalm-param list<string>|string $class */
     public function cssClass(string $styleClass, array|string $class): self
     {
-        if (is_string($class)) {
-            $class = explode(',', str_replace(' ', '', $class));
-        }
+        $this->styleClasses[$styleClass] = is_array($class)
+            ? implode(',', $class)
+            : str_replace(' ', '', $class)
+        ;
 
-        $this->styleClasses[$styleClass] = $class;
         return $this;
     }
 
@@ -61,6 +65,7 @@ class ClassDiagram implements MermaidInterface, Stringable
 
     public function render(): string
     {
+        /** @psalm-var list<string> $output */
         $output = [];
 
         if ($this->title !== '') {
@@ -103,7 +108,7 @@ class ClassDiagram implements MermaidInterface, Stringable
             $output[] = sprintf(
                 self::STYLE_CLASS,
                 Mermaid::INDENTATION,
-                implode(',', $classes),
+                $classes,
                 $styleClass
             );
         }
@@ -112,6 +117,6 @@ class ClassDiagram implements MermaidInterface, Stringable
             $output[] = sprintf(self::NOTE, Mermaid::INDENTATION, $this->note);
         }
 
-        return Mermaid::render(implode("\n", $output));
+        return Mermaid::render($output);
     }
 }
