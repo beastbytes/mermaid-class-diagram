@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace BeastBytes\Mermaid\ClassDiagram;
 
-final class Relationship implements MemberInterface
+final class Relationship
 {
     private const RELATIONSHIP = '%s%s%s%s%s%s%s';
 

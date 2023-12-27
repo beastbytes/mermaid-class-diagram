@@ -12,7 +12,7 @@ use BeastBytes\Mermaid\Mermaid;
 
 use const PHP_EOL;
 
-class Classs implements MemberInterface
+class Classs
 {
     private const ANNOTATION = '%s&lt;&lt;%s&gt;&gt;';
     private const BEGIN_CLASS = '%s%s %s%s {';

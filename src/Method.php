@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace BeastBytes\Mermaid\ClassDiagram;
 
-final class Method implements MemberInterface
+final class Method
 {
     private const METHOD = '%s%s%s(%s)%s';
 

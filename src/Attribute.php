@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace BeastBytes\Mermaid\ClassDiagram;
 
-final class Attribute implements MemberInterface
+final class Attribute
 {
     private const ATTRIBUTE = '%s%s%s%s';
 
