@@ -12,7 +12,7 @@ use BeastBytes\Mermaid\Mermaid;
 use BeastBytes\Mermaid\MermaidInterface;
 use Stringable;
 
-class ClassDiagram implements MermaidInterface, Stringable
+final class ClassDiagram implements MermaidInterface, Stringable
 {
     private const DEFAULT_NAMESPACE = 'default';
     private const NAMESPACE = "%snamespace %s {\n%s\n%s}";

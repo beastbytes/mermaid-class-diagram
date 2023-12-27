@@ -12,9 +12,9 @@ use BeastBytes\Mermaid\Mermaid;
 
 use const PHP_EOL;
 
-class Classs
+final class Classs
 {
-    private const ANNOTATION = '%s&lt;&lt;%s&gt;&gt;';
+    private const ANNOTATION = '%s<<%s>>';
     private const BEGIN_CLASS = '%s%s %s%s {';
     private const END_CLASS = '%s}';
     private const LABEL = '["%s"]';
