@@ -1,7 +1,7 @@
 {
     "name": "beastbytes/mermaid-class-diagram",
     "type": "library",
-    "description": "Mermaid.js class diagram",
+    "description": "PHP for Mermaid.js class diagrams",
     "keywords": [
         "mermaid",
         "class diagram"
