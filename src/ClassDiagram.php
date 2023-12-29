@@ -10,10 +10,13 @@ namespace BeastBytes\Mermaid\ClassDiagram;
 
 use BeastBytes\Mermaid\Mermaid;
 use BeastBytes\Mermaid\MermaidInterface;
+use BeastBytes\Mermaid\StyleTrait;
 use Stringable;
 
 final class ClassDiagram implements MermaidInterface, Stringable
 {
+    use StyleTrait;
+
     private const DEFAULT_NAMESPACE = 'default';
     private const NAMESPACE = "%snamespace %s {\n%s\n%s}";
     private const NOTE = '%snote "%s"';
@@ -25,8 +28,6 @@ final class ClassDiagram implements MermaidInterface, Stringable
     private array $classes = [];
     /** @var Relationship[] */
     private array $relationships = [];
-    /** @var array<string, string> */
-    private array $styleClasses = [];
 
     public function __construct(
         private readonly string $title = '',
@@ -43,17 +44,6 @@ final class ClassDiagram implements MermaidInterface, Stringable
     public function class(Classs $class, string $namespace = self::DEFAULT_NAMESPACE): self
     {
         $this->classes[$namespace][] = $class;
-        return $this;
-    }
-
-    /* @psalm-param list<string>|string $class */
-    public function cssClass(string $styleClass, array|string $class): self
-    {
-        $this->styleClasses[$styleClass] = is_array($class)
-            ? implode(',', $class)
-            : str_replace(' ', '', $class)
-        ;
-
         return $this;
     }
 
@@ -104,13 +94,8 @@ final class ClassDiagram implements MermaidInterface, Stringable
             $output[] = $relationship->render(Mermaid::INDENTATION);
         }
 
-        foreach ($this->styleClasses as $styleClass => $classes) {
-            $output[] = sprintf(
-                self::STYLE_CLASS,
-                Mermaid::INDENTATION,
-                $classes,
-                $styleClass
-            );
+        if (!empty($this->styleClasses)) {
+            $output[] = $this->renderStyles(Mermaid::INDENTATION);
         }
 
         if ($this->note !== '') {
