@@ -16,16 +16,17 @@ use BeastBytes\Mermaid\ClassDiagram\Visibility;
 use BeastBytes\Mermaid\Mermaid;
 
 const CLASS_NAME = 'TestClass';
+const CLASS_NAMESPACE = 'ClassNamespace';
 const CSS_CLASS = 'css-class';
-const NAMESPACED = 'Namespaced';
 const TITLE = 'Title';
 const NOTE = 'Note';
 
 test('Simple classDiagram', function () {
-    $diagram = new ClassDiagram();
     $class = new Classs(CLASS_NAME);
 
-    $diagram->class($class);
+    $diagram = (new ClassDiagram())
+        ->withClass($class)
+    ;
 
     expect($diagram->render())
         ->toBe("<pre class=\"mermaid\">\n"
@@ -38,15 +39,16 @@ test('Simple classDiagram', function () {
 });
 
 test('classDiagram with namespaced class', function () {
-    $diagram = new ClassDiagram();
-    $class = new Classs(CLASS_NAME);
+    $class = new Classs(name: CLASS_NAME, namespace:CLASS_NAMESPACE);
 
-    $diagram->class($class, NAMESPACED);
+    $diagram = (new ClassDiagram())
+        ->withClass($class)
+    ;
 
     expect($diagram->render())
         ->toBe("<pre class=\"mermaid\">\n"
             . "classDiagram\n"
-            . '  namespace ' . NAMESPACED . " {\n"
+            . '  namespace ' . CLASS_NAMESPACE . " {\n"
             . '    class ' . CLASS_NAME . " {\n"
             . "    }\n"
            . "  }\n"
@@ -56,27 +58,29 @@ test('classDiagram with namespaced class', function () {
 });
 
 test('classDiagram with note', function () {
-    $diagram = new ClassDiagram(note: NOTE);
     $class = new Classs(CLASS_NAME);
 
-    $diagram->class($class);
+    $diagram = (new ClassDiagram(note: NOTE))
+        ->withClass($class)
+    ;
 
     expect($diagram->render())
         ->toBe("<pre class=\"mermaid\">\n"
             . "classDiagram\n"
             . '  class ' . CLASS_NAME . " {\n"
             . "  }\n"
-            . '  note "' . NOTE . "\"\n"
+            . '  note &quot;' . NOTE . "&quot;\n"
             . '</pre>'
         )
     ;
 });
 
 test('classDiagram with title', function () {
-    $diagram = new ClassDiagram(title: TITLE);
     $class = new Classs(CLASS_NAME);
 
-    $diagram->class($class);
+    $diagram = (new ClassDiagram(title: TITLE))
+        ->withClass($class)
+    ;
 
     expect($diagram->render())
         ->toBe("<pre class=\"mermaid\">\n"
@@ -91,35 +95,13 @@ test('classDiagram with title', function () {
     ;
 });
 
-test('classDiagram with style', function () {
-    $diagram = new ClassDiagram();
-    $class = new Classs(CLASS_NAME);
-
-    $diagram
-        ->class($class)
-        ->cssClass(CSS_CLASS, CLASS_NAME)
-    ;
-
-    expect($diagram->render())
-        ->toBe("<pre class=\"mermaid\">\n"
-            . "classDiagram\n"
-            . '  class ' . CLASS_NAME . " {\n"
-            . "  }\n"
-            . '  cssClass "' . CLASS_NAME . '" ' . CSS_CLASS . "\n"
-            . '</pre>'
-        )
-    ;
-});
-
 test('classDiagram with relationship', function (RelationshipType $relationship) {
-    $diagram = new ClassDiagram();
     $class1 = new Classs(CLASS_NAME . '1');
     $class2 = new Classs(CLASS_NAME . '2');
 
-    $diagram
-        ->class($class1)
-        ->class($class2)
-        ->relationship(new Relationship($class1, $class2, $relationship))
+    $diagram = (new ClassDiagram())
+        ->withClass($class1, $class2)
+        ->withRelationship(new Relationship($class1, $class2, $relationship))
     ;
 
     expect($diagram->render())
@@ -129,7 +111,7 @@ test('classDiagram with relationship', function (RelationshipType $relationship)
             . "  }\n"
             . '  class ' . CLASS_NAME . "2 {\n"
             . "  }\n"
-            . '  ' . CLASS_NAME . '1 ' . $relationship->value . ' ' . CLASS_NAME . "2\n"
+            . '  ' . CLASS_NAME . '1 ' . htmlspecialchars($relationship->value) . ' ' . CLASS_NAME . "2\n"
             . '</pre>'
         )
     ;
@@ -138,23 +120,18 @@ test('classDiagram with relationship', function (RelationshipType $relationship)
 ;
 
 test('classDiagram with everything', function () {
-    $diagram = new ClassDiagram(title: TITLE, note: NOTE);
-    $class1 = new Classs(CLASS_NAME . '1');
-    $class2 = new Classs(CLASS_NAME . '2');
-    $class3 = new Classs(CLASS_NAME . '3');
-    $class4 = new Classs(CLASS_NAME . '4');
+    $class1 = new Classs(name: CLASS_NAME . '1', namespace: CLASS_NAMESPACE . '1');
+    $class2 = new Classs(name: CLASS_NAME . '2', namespace: CLASS_NAMESPACE . '1');
+    $class3 = new Classs(name: CLASS_NAME . '3', namespace: CLASS_NAMESPACE . '2');
+    $class4 = new Classs(name: CLASS_NAME . '4', namespace: CLASS_NAMESPACE . '2');
 
-    $diagram
-        ->class($class1, NAMESPACED . '1')
-        ->class($class2, NAMESPACED . '1')
-        ->class($class3, NAMESPACED . '2')
-        ->class($class4, NAMESPACED . '2')
-        ->relationship(new Relationship($class1, $class2, RelationshipType::Inheritance))
-        ->relationship(new Relationship($class2, $class3, RelationshipType::Inheritance))
-        ->relationship(new Relationship($class2, $class4, RelationshipType::Inheritance))
-        ->cssClass(CSS_CLASS . '1', CLASS_NAME . '1')
-        ->cssClass(CSS_CLASS . '2', CLASS_NAME . '2')
-        ->cssClass(CSS_CLASS . '3', [CLASS_NAME . '3', CLASS_NAME . '4'])
+    $diagram = (new ClassDiagram(title: TITLE, note: NOTE))
+        ->withClass($class1, $class2, $class3, $class4)
+        ->withRelationship(
+            new Relationship($class1, $class2, RelationshipType::Inheritance),
+            new Relationship($class2, $class3, RelationshipType::Inheritance),
+            new Relationship($class2, $class4, RelationshipType::Inheritance)
+        )
     ;
 
     expect($diagram->render())
@@ -163,25 +140,22 @@ test('classDiagram with everything', function () {
             . TITLE . "\n"
             . "---\n"
             . "classDiagram\n"
-            . '  namespace ' . NAMESPACED . "1 {\n"
+            . '  namespace ' . CLASS_NAMESPACE . "1 {\n"
             . '    class ' . CLASS_NAME . "1 {\n"
             . "    }\n"
             . '    class ' . CLASS_NAME . "2 {\n"
             . "    }\n"
             . "  }\n"
-            . '  namespace ' . NAMESPACED . "2 {\n"
+            . '  namespace ' . CLASS_NAMESPACE . "2 {\n"
             . '    class ' . CLASS_NAME . "3 {\n"
             . "    }\n"
             . '    class ' . CLASS_NAME . "4 {\n"
             . "    }\n"
             . "  }\n"
-            . '  ' . CLASS_NAME . '1 ' . RelationshipType::Inheritance->value . ' ' . CLASS_NAME . "2\n"
-            . '  ' . CLASS_NAME . '2 ' . RelationshipType::Inheritance->value . ' ' . CLASS_NAME . "3\n"
-            . '  ' . CLASS_NAME . '2 ' . RelationshipType::Inheritance->value . ' ' . CLASS_NAME . "4\n"
-            . '  cssClass "' . CLASS_NAME . '1" ' . CSS_CLASS . "1\n"
-            . '  cssClass "' . CLASS_NAME . '2" ' . CSS_CLASS . "2\n"
-            . '  cssClass "' . CLASS_NAME . '3,' . CLASS_NAME . '4" ' . CSS_CLASS . "3\n"
-            . '  note "' . NOTE . "\"\n"
+            . '  ' . CLASS_NAME . '1 --|&gt; ' . CLASS_NAME . "2\n"
+            . '  ' . CLASS_NAME . '2 --|&gt; ' . CLASS_NAME . "3\n"
+            . '  ' . CLASS_NAME . '2 --|&gt; ' . CLASS_NAME . "4\n"
+            . '  note &quot;' . NOTE . "&quot;\n"
             . '</pre>'
         )
     ;

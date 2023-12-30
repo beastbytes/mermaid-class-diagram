@@ -10,26 +10,38 @@ namespace BeastBytes\Mermaid\ClassDiagram;
 
 use BeastBytes\Mermaid\Mermaid;
 
+use BeastBytes\Mermaid\NodeInterface;
+
 use const PHP_EOL;
 
-final class Classs
+final class Classs implements NodeInterface
 {
+    public const DEFAULT_NAMESPACE = '|default|';
     private const ANNOTATION = '%s<<%s>>';
-    private const BEGIN_CLASS = '%s%s %s%s {';
+    private const BEGIN_CLASS = '%s%s %s%s%s {';
     private const END_CLASS = '%s}';
     private const LABEL = '["%s"]';
     private const NOTE = '%snote for %s "%s"';
+    private const STYLE = ':::%s';
     private const TYPE = 'class';
 
+    /** @psalm-var list<Attribute|Method>  */
     private array $members = [];
 
     public function __construct(
         private readonly string $name,
         private readonly string $annotation = '',
         private readonly string $label = '',
-        private readonly string $note = ''
+        private readonly string $note = '',
+        private readonly string $namespace = self::DEFAULT_NAMESPACE,
+        private readonly string $style = ''
     )
     {
+    }
+
+    public function getId(): string
+    {
+        return $this->name;
     }
 
     public function getName(): string
@@ -37,12 +49,49 @@ final class Classs
         return $this->name;
     }
 
-    public function member(Attribute|Method $member): self
+    public function getNamespace(): string
     {
-        $this->members[] = $member;
-        return $this;
+        return $this->namespace;
     }
 
+    public function getStyle(): string
+    {
+        return $this->style;
+    }
+
+    /**
+     * Add one or many members to the current set
+     *
+     * @psalm-suppress PropertyTypeCoercion
+     *
+     * @param Attribute|Method ...$member One or many members
+     * @return Classs
+     */
+    public function addMember(Attribute|Method ...$member): self
+    {
+        $new = clone $this;
+        $new->members = array_merge($new->members, $member);
+        return $new;
+    }
+
+    /**
+     * Replace current members with a new set
+     *
+     * @psalm-suppress PropertyTypeCoercion
+     *
+     * @param Attribute|Method ...$member One or many members
+     * @return Classs
+     */
+    public function withMember(Attribute|Method ...$member): self
+    {
+        $new = clone $this;
+        $new->members = $member;
+        return $new;
+    }
+
+    /**
+     * @internal
+     */
     public function render(string $indentation): string
     {
         $output = [];
@@ -52,7 +101,8 @@ final class Classs
             $indentation,
             self::TYPE,
             $this->name,
-            $this->label === '' ? '' : sprintf(self::LABEL, $this->label)
+            $this->label === '' ? '' : sprintf(self::LABEL, $this->label),
+            $this->style === '' ? '' : sprintf(self::STYLE, $this->style)
         );
 
         if ($this->annotation !== '') {

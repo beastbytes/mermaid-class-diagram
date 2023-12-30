@@ -15,13 +15,9 @@ use Stringable;
 
 final class ClassDiagram implements MermaidInterface, Stringable
 {
-    use StyleTrait;
-
-    private const DEFAULT_NAMESPACE = 'default';
     private const NAMESPACE = "%snamespace %s {\n%s\n%s}";
     private const NOTE = '%snote "%s"';
-    private const STYLE_CLASS = '%scssClass "%s" %s';
-    public const TITLE_DELIMITER = '---';
+    private const TITLE_DELIMITER = '---';
     private const TYPE = 'classDiagram';
 
     /** @var array<string, Classs[]> */
@@ -41,16 +37,65 @@ final class ClassDiagram implements MermaidInterface, Stringable
         return $this->render();
     }
 
-    public function class(Classs $class, string $namespace = self::DEFAULT_NAMESPACE): self
+    /**
+     * Add one or many relationships to the current set
+     *
+     * @param Classs ...$class One or many classes
+     * @return ClassDiagram
+     */
+    public function addClass(Classs ...$class): self
     {
-        $this->classes[$namespace][] = $class;
-        return $this;
+        $new = clone $this;
+
+        foreach ($class as $cls) {
+            $new->classes[$cls->getNamespace()][] = $cls;
+        }
+
+        return $new;
     }
 
-    public function relationship(Relationship $relationship): self
+    /**
+     * Replace current classes with a new set
+     *
+     * @param Classs ...$class One or many classes
+     * @return ClassDiagram
+     */
+    public function withClass(Classs ...$class): self
     {
-        $this->relationships[] = $relationship;
-        return $this;
+        $new = clone $this;
+        $new->classes = [];
+
+        foreach ($class as $cls) {
+            $new->classes[$cls->getNamespace()][] = $cls;
+        }
+
+        return $new;
+    }
+
+    /**
+     * Add one or many relationships to the current set
+     *
+     * @param Relationship ...$relationship One or many relationships
+     * @return ClassDiagram
+     */
+    public function addRelationship(Relationship ...$relationship): self
+    {
+        $new = clone $this;
+        $new->relationships = array_merge($this->relationships, $relationship);
+        return $new;
+    }
+
+    /**
+     * Replace current relationships with a new set
+     *
+     * @param Relationship ...$relationship One or many relationships
+     * @return ClassDiagram
+     */
+    public function withRelationship(Relationship ...$relationship): self
+    {
+        $new = clone $this;
+        $new->relationships = $relationship;
+        return $new;
     }
 
     public function render(): string
@@ -68,7 +113,7 @@ final class ClassDiagram implements MermaidInterface, Stringable
 
         foreach ($this->classes as $namespace => $namespacedClasses) {
             $classes = [];
-            $indentation = $namespace === self::DEFAULT_NAMESPACE
+            $indentation = $namespace === Classs::DEFAULT_NAMESPACE
                 ? Mermaid::INDENTATION
                 : str_repeat(Mermaid::INDENTATION, 2)
             ;
@@ -77,7 +122,7 @@ final class ClassDiagram implements MermaidInterface, Stringable
                 $classes[] = $namespacedClass->render($indentation);
             }
 
-            if ($namespace === self::DEFAULT_NAMESPACE) {
+            if ($namespace === Classs::DEFAULT_NAMESPACE) {
                 $output[] = implode("\n", $classes);
             } else {
                 $output[] = sprintf(
@@ -92,10 +137,6 @@ final class ClassDiagram implements MermaidInterface, Stringable
 
         foreach ($this->relationships as $relationship) {
             $output[] = $relationship->render(Mermaid::INDENTATION);
-        }
-
-        if (!empty($this->styleClasses)) {
-            $output[] = $this->renderStyles(Mermaid::INDENTATION);
         }
 
         if ($this->note !== '') {

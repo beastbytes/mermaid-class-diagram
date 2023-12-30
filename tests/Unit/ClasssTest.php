@@ -14,82 +14,120 @@ use BeastBytes\Mermaid\Mermaid;
 
 const ANNOTATION = 'Annotation';
 const ATTRIBUTE_NAME = 'attribute';
+const CLASS_NAME = 'TestClass';
+const CLASS_NAMESPACE = 'ClassNamespace';
 const LABEL = 'Label';
 const METHOD_NAME = 'getAttribute';
-const NAME = 'TestClass';
 const NOTE = 'Note';
+const STYLE = 'style';
 
 test('Simple class', function () {
-    $class = new Classs(NAME);
+    $class = new Classs(name:CLASS_NAME, namespace: CLASS_NAMESPACE);
 
-    expect($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . NAME . " {\n"
-            . '  }'
-        )
+    /** @psalm-suppress InternalMethod */
+    expect($class->getName())
+        ->toBe(CLASS_NAME)
+        ->and($class->getNamespace())
+        ->toBe(CLASS_NAMESPACE)
+        ->and($class->render(Mermaid::INDENTATION))
+        ->toBe('  class ' . CLASS_NAME . " {\n  }")
     ;
 });
 
 test('Class with annotation', function () {
     $class = new Classs(
-        name: NAME,
-       annotation: ANNOTATION
+        name: CLASS_NAME,
+        annotation: ANNOTATION
     );
 
+    /** @psalm-suppress InternalMethod */
     expect($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . NAME . " {\n"
-            . '    &lt;&lt;' . ANNOTATION . "&gt;&gt;\n"
-            . '  }'
+        ->toBe('  class ' . CLASS_NAME . " {\n"
+               . '    <<' . ANNOTATION . ">>\n"
+               . '  }'
         )
+    ;
+});
+
+test('Class with style', function () {
+    $class = new Classs(name: CLASS_NAME, style: STYLE);
+
+    /** @psalm-suppress InternalMethod */
+    expect($class->render(Mermaid::INDENTATION))
+        ->toBe('  class ' . CLASS_NAME . ':::' . STYLE . " {\n  }")
     ;
 });
 
 test('Class with label', function () {
     $class = new Classs(
-        name: NAME,
+        name: CLASS_NAME,
         label: LABEL
     );
 
+    /** @psalm-suppress InternalMethod */
     expect($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . NAME . '["' . LABEL . '"]' . " {\n"
-            . '  }'
-        )
+        ->toBe('  class ' . CLASS_NAME . '["' . LABEL . '"]' . " {\n" . '  }')
     ;
 });
 
 test('Class with note', function () {
     $class = new Classs(
-        name: NAME,
+        name: CLASS_NAME,
         note: NOTE
     );
 
+    /** @psalm-suppress InternalMethod */
     expect($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . NAME . " {\n"
+        ->toBe('  class ' . CLASS_NAME . " {\n"
             . "  }\n"
-            . '  note for ' . NAME . ' "' . NOTE . '"'
+            . '  note for ' . CLASS_NAME . ' "' . NOTE . '"'
         )
     ;
 });
 
-test('Class with members', function () {
-    $class = new Classs(
-        name: NAME
-    );
-
-    $class
-        ->member(new Attribute(
+test('Class using addMember', function () {
+    $class = (new Classs(name: CLASS_NAME))
+        ->addMember(new Attribute(
             name:       ATTRIBUTE_NAME,
             type:       'string',
             visibility: Visibility::Private
         ))
-        ->member(new Method(
+        ->addMember(new Method(
             name:       METHOD_NAME,
             returnType: 'string',
             visibility: Visibility::Public
         ))
     ;
 
+    /** @psalm-suppress InternalMethod */
     expect($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . NAME . " {\n"
+        ->toBe('  class ' . CLASS_NAME . " {\n"
+            . '    -string ' . ATTRIBUTE_NAME . "\n"
+            . '    +' . METHOD_NAME . "() string\n"
+            . "  }"
+        )
+    ;
+});
+
+test('Class using withMember', function () {
+    $attribute = new Attribute(
+        name:       ATTRIBUTE_NAME,
+        type:       'string',
+        visibility: Visibility::Private
+    );
+    $method = new Method(
+        name:       METHOD_NAME,
+        returnType: 'string',
+        visibility: Visibility::Public
+    );
+
+    $class = (new Classs(name: CLASS_NAME))
+        ->withMember($attribute, $method)
+    ;
+
+    /** @psalm-suppress InternalMethod */
+    expect($class->render(Mermaid::INDENTATION))
+        ->toBe('  class ' . CLASS_NAME . " {\n"
             . '    -string ' . ATTRIBUTE_NAME . "\n"
             . '    +' . METHOD_NAME . "() string\n"
             . "  }"
@@ -98,33 +136,34 @@ test('Class with members', function () {
 });
 
 test('Class with everything', function () {
-    $class = new Classs(
-        name: NAME,
+    $class = (new Classs(
+        name: CLASS_NAME,
         annotation: ANNOTATION,
         label: LABEL,
         note: NOTE
-    );
-
-    $class
-        ->member(new Attribute(
-            name:       ATTRIBUTE_NAME,
-            type:       'string',
-            visibility: Visibility::Private
-        ))
-        ->member(new Method(
-            name:       METHOD_NAME,
-            returnType: 'string',
-            visibility: Visibility::Public
-        ))
+    ))
+        ->withMember(
+            new Attribute(
+                name: ATTRIBUTE_NAME,
+                type: 'string',
+                visibility: Visibility::Private
+            ),
+            new Method(
+                name: METHOD_NAME,
+                returnType: 'string',
+                visibility: Visibility::Public
+            )
+        )
     ;
 
+    /** @psalm-suppress InternalMethod */
     expect($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . NAME . '["' . LABEL . '"]' . " {\n"
-            . '    &lt;&lt;' . ANNOTATION . "&gt;&gt;\n"
+        ->toBe('  class ' . CLASS_NAME . '["' . LABEL . '"]' . " {\n"
+            . '    <<' . ANNOTATION . ">>\n"
             . '    -string ' . ATTRIBUTE_NAME . "\n"
             . '    +' . METHOD_NAME . "() string\n"
             . "  }\n"
-            . '  note for ' . NAME . ' "' . NOTE . '"'
+            . '  note for ' . CLASS_NAME . ' "' . NOTE . '"'
         )
     ;
 });
