@@ -14,7 +14,7 @@ use BeastBytes\Mermaid\NodeInterface;
 
 use const PHP_EOL;
 
-final class Classs implements NodeInterface
+final class Classs
 {
     public const DEFAULT_NAMESPACE = '|default|';
     private const ANNOTATION = '%s<<%s>>';
@@ -37,11 +37,6 @@ final class Classs implements NodeInterface
         private readonly string $style = ''
     )
     {
-    }
-
-    public function getId(): string
-    {
-        return $this->name;
     }
 
     public function getName(): string
