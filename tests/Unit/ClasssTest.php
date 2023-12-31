@@ -19,7 +19,7 @@ const CLASS_NAMESPACE = 'ClassNamespace';
 const LABEL = 'Label';
 const METHOD_NAME = 'getAttribute';
 const NOTE = 'Note';
-const STYLE = 'style';
+const STYLE_CLASS = 'styleClass';
 
 test('Simple class', function () {
     $class = new Classs(name:CLASS_NAME, namespace: CLASS_NAMESPACE);
@@ -50,11 +50,11 @@ test('Class with annotation', function () {
 });
 
 test('Class with style', function () {
-    $class = new Classs(name: CLASS_NAME, style: STYLE);
+    $class = new Classs(name: CLASS_NAME, styleClass: STYLE_CLASS);
 
     /** @psalm-suppress InternalMethod */
     expect($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . CLASS_NAME . ':::' . STYLE . " {\n  }")
+        ->toBe('  class ' . CLASS_NAME . Mermaid::CLASS_OPERATOR . STYLE_CLASS . " {\n  }")
     ;
 });
 
@@ -140,7 +140,8 @@ test('Class with everything', function () {
         name: CLASS_NAME,
         annotation: ANNOTATION,
         label: LABEL,
-        note: NOTE
+        note: NOTE,
+        styleClass: STYLE_CLASS
     ))
         ->withMember(
             new Attribute(
@@ -158,7 +159,7 @@ test('Class with everything', function () {
 
     /** @psalm-suppress InternalMethod */
     expect($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . CLASS_NAME . '["' . LABEL . '"]' . " {\n"
+        ->toBe('  class ' . CLASS_NAME . '["' . LABEL . '"]' . Mermaid::CLASS_OPERATOR . STYLE_CLASS . " {\n"
             . '    <<' . ANNOTATION . ">>\n"
             . '    -string ' . ATTRIBUTE_NAME . "\n"
             . '    +' . METHOD_NAME . "() string\n"

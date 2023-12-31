@@ -12,17 +12,20 @@ use BeastBytes\Mermaid\Mermaid;
 
 use BeastBytes\Mermaid\NodeInterface;
 
+use BeastBytes\Mermaid\StyleClassTrait;
+
 use const PHP_EOL;
 
 final class Classs
 {
+    use StyleClassTrait;
+
     public const DEFAULT_NAMESPACE = '|default|';
     private const ANNOTATION = '%s<<%s>>';
     private const BEGIN_CLASS = '%s%s %s%s%s {';
     private const END_CLASS = '%s}';
     private const LABEL = '["%s"]';
     private const NOTE = '%snote for %s "%s"';
-    private const STYLE = ':::%s';
     private const TYPE = 'class';
 
     /** @psalm-var list<Attribute|Method>  */
@@ -34,7 +37,7 @@ final class Classs
         private readonly string $label = '',
         private readonly string $note = '',
         private readonly string $namespace = self::DEFAULT_NAMESPACE,
-        private readonly string $style = ''
+        private readonly string $styleClass = ''
     )
     {
     }
@@ -97,7 +100,7 @@ final class Classs
             self::TYPE,
             $this->name,
             $this->label === '' ? '' : sprintf(self::LABEL, $this->label),
-            $this->style === '' ? '' : sprintf(self::STYLE, $this->style)
+            $this->getStyleClass()
         );
 
         if ($this->annotation !== '') {
