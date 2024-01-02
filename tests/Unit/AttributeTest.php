@@ -8,15 +8,14 @@ declare(strict_types=1);
 
 use BeastBytes\Mermaid\ClassDiagram\Attribute;
 use BeastBytes\Mermaid\ClassDiagram\Visibility;
-use BeastBytes\Mermaid\Mermaid;
 
 const NAME = 'TestAttribute';
 
 test('Simple attribute', function () {
     $attribute = new Attribute(NAME);
 
-    expect($attribute->render(Mermaid::INDENTATION))
-        ->toBe('  ' . NAME)
+    expect($attribute->render(''))
+        ->toBe(NAME)
     ;
 });
 
@@ -26,8 +25,8 @@ test('Attribute with visibility', function (Visibility $visibility) {
         visibility: $visibility
     );
 
-    expect($method->render(Mermaid::INDENTATION))
-        ->toBe('  ' . $visibility->value . NAME)
+    expect($method->render(''))
+        ->toBe($visibility->value . NAME)
     ;
 })
     ->with([
@@ -44,8 +43,8 @@ test('Method with type', function () {
         type: 'string'
     );
 
-    expect($method->render(Mermaid::INDENTATION))
-        ->toBe('  string ' . NAME)
+    expect($method->render(''))
+        ->toBe('string ' . NAME)
     ;
 });
 
@@ -56,7 +55,7 @@ test('Attribute with everything', function () {
         visibility: Visibility::Public
     );
 
-    expect($method->render(Mermaid::INDENTATION))
-        ->toBe('  ' . Visibility::Public->value . 'string ' . NAME)
+    expect($method->render(''))
+        ->toBe(Visibility::Public->value . 'string ' . NAME)
     ;
 });

@@ -8,15 +8,14 @@ declare(strict_types=1);
 
 use BeastBytes\Mermaid\ClassDiagram\Method;
 use BeastBytes\Mermaid\ClassDiagram\Visibility;
-use BeastBytes\Mermaid\Mermaid;
 
 const NAME = 'TestMethod';
 
 test('Simple method', function () {
     $method = new Method(NAME);
 
-    expect($method->render(Mermaid::INDENTATION))
-        ->toBe('  ' . NAME . '()')
+    expect($method->render(''))
+        ->toBe(NAME . '()')
     ;
 });
 
@@ -26,8 +25,8 @@ test('Method with visibility', function (Visibility $visibility) {
         visibility: $visibility
     );
 
-    expect($method->render(Mermaid::INDENTATION))
-        ->toBe('  ' . $visibility->value . NAME . '()')
+    expect($method->render(''))
+        ->toBe($visibility->value . NAME . '()')
     ;
 })
     ->with([
@@ -44,8 +43,8 @@ test('Method with parameters', function () {
         parameters: ['string $string', 'bool $bool', 'int $int']
     );
 
-    expect($method->render(Mermaid::INDENTATION))
-        ->toBe('  ' . NAME . '(string $string, bool $bool, int $int)')
+    expect($method->render(''))
+        ->toBe(NAME . '(string $string, bool $bool, int $int)')
     ;
 });
 
@@ -55,8 +54,8 @@ test('Method with return type', function () {
         returnType: 'string'
     );
 
-    expect($method->render(Mermaid::INDENTATION))
-        ->toBe('  ' . NAME . '() string')
+    expect($method->render(''))
+        ->toBe(NAME . '() string')
     ;
 });
 
@@ -68,7 +67,7 @@ test('Method with everything', function () {
         visibility: Visibility::Public
     );
 
-    expect($method->render(Mermaid::INDENTATION))
-        ->toBe('  ' . Visibility::Public->value . NAME . '(string $string, bool $bool, int $int) string')
+    expect($method->render(''))
+        ->toBe(Visibility::Public->value . NAME . '(string $string, bool $bool, int $int) string')
     ;
 });

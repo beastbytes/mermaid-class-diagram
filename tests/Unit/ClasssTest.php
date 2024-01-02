@@ -29,8 +29,8 @@ test('Simple class', function () {
         ->toBe(CLASS_NAME)
         ->and($class->getNamespace())
         ->toBe(CLASS_NAMESPACE)
-        ->and($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . CLASS_NAME . " {\n  }")
+        ->and($class->render(''))
+        ->toBe('class ' . CLASS_NAME . " {\n}")
     ;
 });
 
@@ -41,10 +41,10 @@ test('Class with annotation', function () {
     );
 
     /** @psalm-suppress InternalMethod */
-    expect($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . CLASS_NAME . " {\n"
-               . '    <<' . ANNOTATION . ">>\n"
-               . '  }'
+    expect($class->render(''))
+        ->toBe('class ' . CLASS_NAME . " {\n"
+               . '  <<' . ANNOTATION . ">>\n"
+               . '}'
         )
     ;
 });
@@ -53,8 +53,8 @@ test('Class with style', function () {
     $class = new Classs(name: CLASS_NAME, styleClass: STYLE_CLASS);
 
     /** @psalm-suppress InternalMethod */
-    expect($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . CLASS_NAME . Mermaid::CLASS_OPERATOR . STYLE_CLASS . " {\n  }")
+    expect($class->render(''))
+        ->toBe('class ' . CLASS_NAME . Mermaid::CLASS_OPERATOR . STYLE_CLASS . " {\n}")
     ;
 });
 
@@ -65,8 +65,8 @@ test('Class with label', function () {
     );
 
     /** @psalm-suppress InternalMethod */
-    expect($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . CLASS_NAME . '["' . LABEL . '"]' . " {\n" . '  }')
+    expect($class->render(''))
+        ->toBe('class ' . CLASS_NAME . '["' . LABEL . '"]' . " {\n}")
     ;
 });
 
@@ -77,10 +77,10 @@ test('Class with note', function () {
     );
 
     /** @psalm-suppress InternalMethod */
-    expect($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . CLASS_NAME . " {\n"
-            . "  }\n"
-            . '  note for ' . CLASS_NAME . ' "' . NOTE . '"'
+    expect($class->render(''))
+        ->toBe('class ' . CLASS_NAME . " {\n"
+            . "}\n"
+            . 'note for ' . CLASS_NAME . ' "' . NOTE . '"'
         )
     ;
 });
@@ -100,11 +100,11 @@ test('Class using addMember', function () {
     ;
 
     /** @psalm-suppress InternalMethod */
-    expect($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . CLASS_NAME . " {\n"
-            . '    -string ' . ATTRIBUTE_NAME . "\n"
-            . '    +' . METHOD_NAME . "() string\n"
-            . "  }"
+    expect($class->render(''))
+        ->toBe('class ' . CLASS_NAME . " {\n"
+            . '  -string ' . ATTRIBUTE_NAME . "\n"
+            . '  +' . METHOD_NAME . "() string\n"
+            . '}'
         )
     ;
 });
@@ -126,11 +126,11 @@ test('Class using withMember', function () {
     ;
 
     /** @psalm-suppress InternalMethod */
-    expect($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . CLASS_NAME . " {\n"
-            . '    -string ' . ATTRIBUTE_NAME . "\n"
-            . '    +' . METHOD_NAME . "() string\n"
-            . "  }"
+    expect($class->render(''))
+        ->toBe('class ' . CLASS_NAME . " {\n"
+            . '  -string ' . ATTRIBUTE_NAME . "\n"
+            . '  +' . METHOD_NAME . "() string\n"
+            . '}'
         )
     ;
 });
@@ -158,13 +158,13 @@ test('Class with everything', function () {
     ;
 
     /** @psalm-suppress InternalMethod */
-    expect($class->render(Mermaid::INDENTATION))
-        ->toBe('  class ' . CLASS_NAME . '["' . LABEL . '"]' . Mermaid::CLASS_OPERATOR . STYLE_CLASS . " {\n"
-            . '    <<' . ANNOTATION . ">>\n"
-            . '    -string ' . ATTRIBUTE_NAME . "\n"
-            . '    +' . METHOD_NAME . "() string\n"
-            . "  }\n"
-            . '  note for ' . CLASS_NAME . ' "' . NOTE . '"'
+    expect($class->render(''))
+        ->toBe('class ' . CLASS_NAME . '["' . LABEL . '"]' . Mermaid::CLASS_OPERATOR . STYLE_CLASS . " {\n"
+            . '  <<' . ANNOTATION . ">>\n"
+            . '  -string ' . ATTRIBUTE_NAME . "\n"
+            . '  +' . METHOD_NAME . "() string\n"
+            . "}\n"
+            . 'note for ' . CLASS_NAME . ' "' . NOTE . '"'
         )
     ;
 });

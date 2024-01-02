@@ -22,8 +22,8 @@ test('Simple relationship', function (RelationshipType $type) {
 
     $relationship = new Relationship($classA, $classB, $type);
 
-    expect($relationship->render(Mermaid::INDENTATION))
-        ->toBe('  ' . $classA->getName() . ' ' . $type->value . ' ' . $classB->getName())
+    expect($relationship->render(''))
+        ->toBe($classA->getName() . ' ' . $type->value . ' ' . $classB->getName())
     ;
 })
     ->with('relationshipType')
@@ -35,8 +35,8 @@ test('Relationship with label', function () {
 
     $relationship = new Relationship($classA, $classB, RelationshipType::Inheritance, LABEL);
 
-    expect($relationship->render(Mermaid::INDENTATION))
-        ->toBe('  ' . $classA->getName()
+    expect($relationship->render(''))
+        ->toBe($classA->getName()
             . ' ' . RelationshipType::Inheritance->value
             . ' ' . $classB->getName()
             . ' : ' . LABEL
@@ -57,8 +57,8 @@ test('Relationship with cardinality', function ($type, $cardinalityA , $cardinal
         $cardinalityB
 );
 
-    expect($relationship->render(Mermaid::INDENTATION))
-        ->toBe('  ' . $classA->getName()
+    expect($relationship->render(''))
+        ->toBe($classA->getName()
             . ' "' . $cardinalityA->value . '"'
             . ' ' . $type->value
             . ' "' . $cardinalityB->value . '"'

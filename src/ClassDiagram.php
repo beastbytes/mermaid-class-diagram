@@ -10,11 +10,14 @@ namespace BeastBytes\Mermaid\ClassDiagram;
 
 use BeastBytes\Mermaid\Mermaid;
 use BeastBytes\Mermaid\MermaidInterface;
-use BeastBytes\Mermaid\StyleTrait;
+use BeastBytes\Mermaid\StyleClassTrait;
+use BeastBytes\Mermaid\TitleTrait;
 use Stringable;
 
 final class ClassDiagram implements MermaidInterface, Stringable
 {
+    use TitleTrait;
+
     private const NAMESPACE = "%snamespace %s {\n%s\n%s}";
     private const NOTE = '%snote "%s"';
     private const TITLE_DELIMITER = '---';
@@ -104,9 +107,7 @@ final class ClassDiagram implements MermaidInterface, Stringable
         $output = [];
 
         if ($this->title !== '') {
-            $output[] = self::TITLE_DELIMITER;
-            $output[] = $this->title;
-            $output[] = self::TITLE_DELIMITER;
+            $output[] = $this->getTitle();
         }
 
         $output[] = self::TYPE;

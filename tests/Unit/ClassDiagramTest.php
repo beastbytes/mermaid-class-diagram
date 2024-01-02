@@ -17,7 +17,6 @@ use BeastBytes\Mermaid\Mermaid;
 
 const CLASS_NAME = 'TestClass';
 const CLASS_NAMESPACE = 'ClassNamespace';
-const CSS_CLASS = 'css-class';
 const TITLE = 'Title';
 const NOTE = 'Note';
 
@@ -85,7 +84,7 @@ test('classDiagram with title', function () {
     expect($diagram->render())
         ->toBe("<pre class=\"mermaid\">\n"
             . "---\n"
-            . TITLE . "\n"
+            . 'title: ' . TITLE . "\n"
             . "---\n"
             . "classDiagram\n"
             . '  class ' . CLASS_NAME . " {\n"
@@ -137,7 +136,7 @@ test('classDiagram with everything', function () {
     expect($diagram->render())
         ->toBe("<pre class=\"mermaid\">\n"
             . "---\n"
-            . TITLE . "\n"
+            . 'title: ' . TITLE . "\n"
             . "---\n"
             . "classDiagram\n"
             . '  namespace ' . CLASS_NAMESPACE . "1 {\n"
