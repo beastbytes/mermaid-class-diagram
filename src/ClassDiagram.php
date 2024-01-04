@@ -10,17 +10,16 @@ namespace BeastBytes\Mermaid\ClassDiagram;
 
 use BeastBytes\Mermaid\Mermaid;
 use BeastBytes\Mermaid\MermaidInterface;
+use BeastBytes\Mermaid\RenderItemsTrait;
 use BeastBytes\Mermaid\StyleClassTrait;
 use BeastBytes\Mermaid\TitleTrait;
 use Stringable;
 
 final class ClassDiagram implements MermaidInterface, Stringable
 {
+    use RenderItemsTrait;
     use TitleTrait;
 
-    private const NAMESPACE = "%snamespace %s {\n%s\n%s}";
-    private const NOTE = '%snote "%s"';
-    private const TITLE_DELIMITER = '---';
     private const TYPE = 'classDiagram';
 
     /** @var array<string, Classs[]> */
@@ -112,35 +111,23 @@ final class ClassDiagram implements MermaidInterface, Stringable
         $output[] = self::TYPE;
 
         foreach ($this->classes as $namespace => $namespacedClasses) {
-            $classes = [];
-            $indentation = $namespace === Classs::DEFAULT_NAMESPACE
-                ? Mermaid::INDENTATION
-                : str_repeat(Mermaid::INDENTATION, 2)
-            ;
-
-            foreach ($namespacedClasses as $namespacedClass) {
-                $classes[] = $namespacedClass->render($indentation);
-            }
-
             if ($namespace === Classs::DEFAULT_NAMESPACE) {
-                $output[] = implode("\n", $classes);
+                $output[] = $this->renderItems($namespacedClasses, '');
             } else {
-                $output[] = sprintf(
-                    self::NAMESPACE,
-                    Mermaid::INDENTATION,
-                    $namespace,
-                    implode("\n", $classes),
-                    Mermaid::INDENTATION
-                );
+                $output[] = Mermaid::INDENTATION
+                    . "namespace $namespace {\n"
+                    . $this->renderItems($namespacedClasses, Mermaid::INDENTATION) . "\n"
+                    . Mermaid::INDENTATION . '}'
+                ;
             }
         }
 
-        foreach ($this->relationships as $relationship) {
-            $output[] = $relationship->render(Mermaid::INDENTATION);
+        if (count($this->relationships) > 0) {
+            $output[] = $this->renderItems($this->relationships, '');
         }
 
         if ($this->note !== '') {
-            $output[] = sprintf(self::NOTE, Mermaid::INDENTATION, $this->note);
+            $output[] = Mermaid::INDENTATION . 'note "' . $this->note . '"';
         }
 
         return Mermaid::render($output);
