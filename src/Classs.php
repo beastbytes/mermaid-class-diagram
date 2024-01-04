@@ -9,23 +9,15 @@ declare(strict_types=1);
 namespace BeastBytes\Mermaid\ClassDiagram;
 
 use BeastBytes\Mermaid\Mermaid;
-
-use BeastBytes\Mermaid\NodeInterface;
-
+use BeastBytes\Mermaid\RenderItemsTrait;
 use BeastBytes\Mermaid\StyleClassTrait;
-
-use const PHP_EOL;
 
 final class Classs
 {
+    use RenderItemsTrait;
     use StyleClassTrait;
 
     public const DEFAULT_NAMESPACE = '|default|';
-    private const ANNOTATION = '%s<<%s>>';
-    private const BEGIN_CLASS = '%s%s %s%s%s {';
-    private const END_CLASS = '%s}';
-    private const LABEL = '["%s"]';
-    private const NOTE = '%snote for %s "%s"';
     private const TYPE = 'class';
 
     /** @psalm-var list<Attribute|Method>  */
@@ -42,19 +34,16 @@ final class Classs
     {
     }
 
+    /** @internal */
     public function getName(): string
     {
         return $this->name;
     }
 
+    /** @internal */
     public function getNamespace(): string
     {
         return $this->namespace;
-    }
-
-    public function getStyle(): string
-    {
-        return $this->style;
     }
 
     /**
@@ -87,37 +76,32 @@ final class Classs
         return $new;
     }
 
-    /**
-     * @internal
-     */
+    /** @internal */
     public function render(string $indentation): string
     {
         $output = [];
 
-        $output[] = sprintf(
-            self::BEGIN_CLASS,
-            $indentation,
-            self::TYPE,
-            $this->name,
-            $this->label === '' ? '' : sprintf(self::LABEL, $this->label),
-            $this->getStyleClass()
-        );
+        $output[] = $indentation
+            . self::TYPE
+            . ' '
+            . $this->name
+            . ($this->label === '' ? '' : '["' . $this->label . '"]')
+            . $this->getStyleClass()
+            . ' {'
+        ;
 
         if ($this->annotation !== '') {
-            $output[] = sprintf(
-                self::ANNOTATION,
-                $indentation . Mermaid::INDENTATION, $this->annotation
-            );
+            $output[] = $indentation . Mermaid::INDENTATION . '<<' . $this->annotation . '>>';
         }
 
-        foreach ($this->members as $member) {
-            $output[] = $member->render($indentation . Mermaid::INDENTATION);
+        if (count($this->members) > 0) {
+            $output[] = $this->renderItems($this->members, $indentation);
         }
 
-        $output[] = sprintf(self::END_CLASS, $indentation);
+        $output[] = $indentation . '}';
 
         if ($this->note !== '') {
-            $output[] = sprintf(self::NOTE, $indentation, $this->name, $this->note);
+            $output[] = $indentation . 'note for ' . $this->name . ' "' . $this->note . '"';
         }
 
         return implode("\n", $output);

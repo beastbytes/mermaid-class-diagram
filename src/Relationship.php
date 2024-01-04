@@ -10,8 +10,6 @@ namespace BeastBytes\Mermaid\ClassDiagram;
 
 final class Relationship
 {
-    private const RELATIONSHIP = '%s%s%s%s%s%s%s';
-
     public function __construct(
         private readonly Classs $classA,
         private readonly Classs $classB,
@@ -23,17 +21,18 @@ final class Relationship
     {
     }
 
+    /** @internal */
     public function render(string $indentation): string
     {
-        return sprintf(
-            self::RELATIONSHIP,
-            $indentation,
-            $this->classA->getName() . ' ',
-            $this->cardinalityA === null ? '' : '"' . $this->cardinalityA->value . '" ',
-            $this->type->value . ' ',
-            $this->cardinalityB === null ? '' : '"' . $this->cardinalityB->value . '" ',
-            $this->classB->getName(),
-            $this->label === null ? '' : ' : ' . $this->label
-        );
+        return $indentation
+            . $this->classA->getName()
+            . ' '
+            . ($this->cardinalityA === null ? '' : '"' . $this->cardinalityA->value . '" ')
+            . $this->type->value
+            . ' '
+            . ($this->cardinalityB === null ? '' : '"' . $this->cardinalityB->value . '" ')
+            . $this->classB->getName()
+            . ($this->label === null ? '' : ' : ' . $this->label)
+        ;
     }
 }

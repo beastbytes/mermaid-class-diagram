@@ -10,8 +10,6 @@ namespace BeastBytes\Mermaid\ClassDiagram;
 
 final class Method
 {
-    private const METHOD = '%s%s%s(%s)%s';
-
     public function __construct(
         private readonly string $name,
         private readonly array $parameters = [],
@@ -21,15 +19,14 @@ final class Method
     {
     }
 
+    /** @internal */
     public function render(string $indentation): string
     {
-        return sprintf(
-            self::METHOD,
-            $indentation,
-            $this->visibility === null ? '' : $this->visibility->value,
-            $this->name,
-            implode(', ', $this->parameters),
-            $this->returnType === null ? '' : ' ' . $this->returnType
-        );
+        return $indentation
+            . ($this->visibility === null ? '' : $this->visibility->value)
+            . $this->name
+            . '(' . implode(', ', $this->parameters) . ')'
+            . ($this->returnType === null ? '' : ' ' . $this->returnType)
+        ;
     }
 }

@@ -10,8 +10,6 @@ namespace BeastBytes\Mermaid\ClassDiagram;
 
 final class Attribute
 {
-    private const ATTRIBUTE = '%s%s%s%s';
-
     public function __construct(
         private readonly string $name,
         private readonly ?string $type = null,
@@ -19,14 +17,14 @@ final class Attribute
     )
     {
     }
+
+    /** @internal */
     public function render(string $indentation): string
     {
-        return sprintf(
-            self::ATTRIBUTE,
-            $indentation,
-            $this->visibility === null ? '' : $this->visibility->value,
-            $this->type === null ? '' : $this->type . ' ',
-            $this->name
-        );
+        return $indentation
+            . ($this->visibility === null ? '' : $this->visibility->value)
+            . ($this->type === null ? '' : $this->type . ' ')
+            . $this->name
+        ;
     }
 }

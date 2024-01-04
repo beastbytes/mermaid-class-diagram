@@ -103,7 +103,6 @@ final class ClassDiagram implements MermaidInterface, Stringable
 
     public function render(): string
     {
-        /** @psalm-var list<string> $output */
         $output = [];
 
         if ($this->title !== '') {
