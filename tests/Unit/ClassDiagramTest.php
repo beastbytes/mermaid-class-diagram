@@ -6,14 +6,11 @@
 
 declare(strict_types=1);
 
-use BeastBytes\Mermaid\ClassDiagram\Attribute;
 use BeastBytes\Mermaid\ClassDiagram\ClassDiagram;
 use BeastBytes\Mermaid\ClassDiagram\Classs;
-use BeastBytes\Mermaid\ClassDiagram\Method;
+use BeastBytes\Mermaid\ClassDiagram\Note;
 use BeastBytes\Mermaid\ClassDiagram\Relationship;
 use BeastBytes\Mermaid\ClassDiagram\RelationshipType;
-use BeastBytes\Mermaid\ClassDiagram\Visibility;
-use BeastBytes\Mermaid\Mermaid;
 
 const CLASS_NAME = 'TestClass';
 const CLASS_NAMESPACE = 'ClassNamespace';
@@ -59,7 +56,8 @@ test('classDiagram with namespaced class', function () {
 test('classDiagram with note', function () {
     $class = new Classs(CLASS_NAME);
 
-    $diagram = (new ClassDiagram(note: NOTE))
+    $diagram = (new ClassDiagram())
+        ->withNote(new Note(NOTE))
         ->withClass($class)
     ;
 
@@ -124,7 +122,8 @@ test('classDiagram with everything', function () {
     $class3 = new Classs(name: CLASS_NAME . '3', namespace: CLASS_NAMESPACE . '2');
     $class4 = new Classs(name: CLASS_NAME . '4', namespace: CLASS_NAMESPACE . '2');
 
-    $diagram = (new ClassDiagram(title: TITLE, note: NOTE))
+    $diagram = (new ClassDiagram(title: TITLE))
+        ->withNote(new Note(NOTE))
         ->withClass($class1, $class2, $class3, $class4)
         ->withRelationship(
             new Relationship($class1, $class2, RelationshipType::Inheritance),

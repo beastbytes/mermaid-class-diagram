@@ -9,6 +9,7 @@ declare(strict_types=1);
 use BeastBytes\Mermaid\ClassDiagram\Attribute;
 use BeastBytes\Mermaid\ClassDiagram\Classs;
 use BeastBytes\Mermaid\ClassDiagram\Method;
+use BeastBytes\Mermaid\ClassDiagram\Note;
 use BeastBytes\Mermaid\ClassDiagram\Visibility;
 use BeastBytes\Mermaid\Mermaid;
 
@@ -50,7 +51,7 @@ test('Class with annotation', function () {
 });
 
 test('Class with style', function () {
-    $class = new Classs(name: CLASS_NAME, styleClass: STYLE_CLASS);
+    $class = (new Classs(name: CLASS_NAME))->withStyleClass(STYLE_CLASS);
 
     /** @psalm-suppress InternalMethod */
     expect($class->render(''))
@@ -71,10 +72,7 @@ test('Class with label', function () {
 });
 
 test('Class with note', function () {
-    $class = new Classs(
-        name: CLASS_NAME,
-        note: NOTE
-    );
+    $class = (new Classs(CLASS_NAME))->withNote(new Note(NOTE));
 
     /** @psalm-suppress InternalMethod */
     expect($class->render(''))
@@ -139,10 +137,9 @@ test('Class with everything', function () {
     $class = (new Classs(
         name: CLASS_NAME,
         annotation: ANNOTATION,
-        label: LABEL,
-        note: NOTE,
-        styleClass: STYLE_CLASS
+        label: LABEL
     ))
+        ->withNote(new Note(NOTE))
         ->withMember(
             new Attribute(
                 name: ATTRIBUTE_NAME,
@@ -155,6 +152,7 @@ test('Class with everything', function () {
                 visibility: Visibility::Public
             )
         )
+        ->withStyleClass(STYLE_CLASS)
     ;
 
     /** @psalm-suppress InternalMethod */
