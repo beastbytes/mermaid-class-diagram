@@ -17,19 +17,18 @@ final class Classs
     use RenderItemsTrait;
     use StyleClassTrait;
 
-    public const DEFAULT_NAMESPACE = '|default|';
+    public const DEFAULT_NAMESPACE = '';
     private const TYPE = 'class';
 
     /** @psalm-var list<Attribute|Method>  */
     private array $members = [];
+    private ?Note $note = null;
 
     public function __construct(
         private readonly string $name,
         private readonly string $annotation = '',
         private readonly string $label = '',
-        private readonly string $note = '',
-        private readonly string $namespace = self::DEFAULT_NAMESPACE,
-        private readonly string $styleClass = ''
+        private readonly string $namespace = self::DEFAULT_NAMESPACE
     )
     {
     }
@@ -76,6 +75,13 @@ final class Classs
         return $new;
     }
 
+    public function withNote(Note $note): self
+    {
+        $new = clone $this;
+        $new->note = $note;
+        return $new;
+    }
+
     /** @internal */
     public function render(string $indentation): string
     {
@@ -100,8 +106,8 @@ final class Classs
 
         $output[] = $indentation . '}';
 
-        if ($this->note !== '') {
-            $output[] = $indentation . 'note for ' . $this->name . ' "' . $this->note . '"';
+        if ($this->note !== null) {
+            $output[] = $this->note->render($indentation, $this);
         }
 
         return implode("\n", $output);

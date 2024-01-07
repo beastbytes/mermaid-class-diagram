@@ -11,12 +11,13 @@ namespace BeastBytes\Mermaid\ClassDiagram;
 use BeastBytes\Mermaid\Mermaid;
 use BeastBytes\Mermaid\MermaidInterface;
 use BeastBytes\Mermaid\RenderItemsTrait;
-use BeastBytes\Mermaid\StyleClassTrait;
+use BeastBytes\Mermaid\ClassDefTrait;
 use BeastBytes\Mermaid\TitleTrait;
 use Stringable;
 
 final class ClassDiagram implements MermaidInterface, Stringable
 {
+    use ClassDefTrait;
     use RenderItemsTrait;
     use TitleTrait;
 
@@ -26,10 +27,10 @@ final class ClassDiagram implements MermaidInterface, Stringable
     private array $classes = [];
     /** @var Relationship[] */
     private array $relationships = [];
+    private ?Note $note = null;
 
     public function __construct(
-        private readonly string $title = '',
-        private readonly string $note = '',
+        private readonly string $title = ''
     )
     {
     }
@@ -100,6 +101,13 @@ final class ClassDiagram implements MermaidInterface, Stringable
         return $new;
     }
 
+    public function withNote(Note $note): self
+    {
+        $new = clone $this;
+        $new->note = $note;
+        return $new;
+    }
+
     public function render(): string
     {
         $output = [];
@@ -126,8 +134,12 @@ final class ClassDiagram implements MermaidInterface, Stringable
             $output[] = $this->renderItems($this->relationships, '');
         }
 
-        if ($this->note !== '') {
-            $output[] = Mermaid::INDENTATION . 'note "' . $this->note . '"';
+        if ($this->note !== null) {
+            $output[] = $this->note->render(Mermaid::INDENTATION);
+        }
+
+        if (!empty($this->classDefs)) {
+            $output[] = $this->renderClassDefs(Mermaid::INDENTATION);
         }
 
         return Mermaid::render($output);
