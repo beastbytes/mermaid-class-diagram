@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 use BeastBytes\Mermaid\ClassDiagram\ClassDiagram;
 use BeastBytes\Mermaid\ClassDiagram\Classs;
-use BeastBytes\Mermaid\ClassDiagram\Note;
 use BeastBytes\Mermaid\ClassDiagram\Relationship;
 use BeastBytes\Mermaid\ClassDiagram\RelationshipType;
 
@@ -57,7 +56,7 @@ test('classDiagram with note', function () {
     $class = new Classs(CLASS_NAME);
 
     $diagram = (new ClassDiagram())
-        ->withNote(new Note(NOTE))
+        ->withNote(NOTE)
         ->withClass($class)
     ;
 
@@ -122,14 +121,19 @@ test('classDiagram with everything', function () {
     ;
     $class2 = (new Classs(name: CLASS_NAME . '2', namespace: CLASS_NAMESPACE . '1'))
         ->withStyleClass('classDef2')
+        ->withNote("Class 2 note")
+        ->withAction('https://example.com')
     ;
     $class3 = (new Classs(name: CLASS_NAME . '3', namespace: CLASS_NAMESPACE . '2'))
         ->withStyleClass('classDef1')
+        ->withNote("Class 3 note")
     ;
-    $class4 = (new Classs(name: CLASS_NAME . '4', namespace: CLASS_NAMESPACE . '2'));
+    $class4 = (new Classs(name: CLASS_NAME . '4', namespace: CLASS_NAMESPACE . '2'))
+        ->withAction('https://example.com')
+    ;
 
     $diagram = (new ClassDiagram(title: TITLE))
-        ->withNote(new Note(NOTE))
+        ->withNote(NOTE)
         ->withClass($class1, $class2, $class3, $class4)
         ->withRelationship(
             new Relationship($class1, $class2, RelationshipType::Inheritance),
@@ -171,6 +175,10 @@ test('classDiagram with everything', function () {
             . '  ' . CLASS_NAME . '2 --|&gt; ' . CLASS_NAME . "3\n"
             . '  ' . CLASS_NAME . '2 --|&gt; ' . CLASS_NAME . "4\n"
             . '  note &quot;' . NOTE . "&quot;\n"
+            . "  note for TestClass2 &quot;Class 2 note&quot;\n"
+            . "  note for TestClass3 &quot;Class 3 note&quot;\n"
+            . "  click TestClass2 href &quot;https://example.com&quot;\n"
+            . "  click TestClass4 href &quot;https://example.com&quot;\n"
             . "  classDef classDef0 fill:white;\n"
             . "  classDef classDef1 font-style:italic;\n"
             . "  classDef classDef2 fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow;\n"

@@ -23,11 +23,23 @@ final class ClassDiagram implements MermaidInterface, Stringable
 
     private const TYPE = 'classDiagram';
 
-    /** @var array<string, Classs[]> */
+    /**
+     * @psalm-var list<string> $actions
+     * @var string[] $actions
+     */
+    private array $actions = [];
+    /** @var array<string, Classs[]> $classes */
     private array $classes = [];
-    /** @var Relationship[] */
+    /**
+     * @psalm-var list<Relationship> $relationships
+     * @var Relationship[] $relationships
+     */
     private array $relationships = [];
-    private ?Note $note = null;
+    /**
+     * @psalm-var list<string> $notes
+     * @var string[] $notes
+     */
+    private array $notes = [];
 
     public function __construct(
         private readonly string $title = ''
@@ -101,10 +113,10 @@ final class ClassDiagram implements MermaidInterface, Stringable
         return $new;
     }
 
-    public function withNote(Note $note): self
+    public function withNote(string $note): self
     {
         $new = clone $this;
-        $new->note = $note;
+        $new->notes[] = 'note "' . $note . '"';
         return $new;
     }
 
@@ -118,15 +130,24 @@ final class ClassDiagram implements MermaidInterface, Stringable
 
         $output[] = self::TYPE;
 
-        foreach ($this->classes as $namespace => $namespacedClasses) {
+        foreach ($this->classes as $namespace => $classes) {
             if ($namespace === Classs::DEFAULT_NAMESPACE) {
-                $output[] = $this->renderItems($namespacedClasses, '');
+                $output[] = $this->renderItems($classes, '');
             } else {
                 $output[] = Mermaid::INDENTATION
                     . "namespace $namespace {\n"
-                    . $this->renderItems($namespacedClasses, Mermaid::INDENTATION) . "\n"
+                    . $this->renderItems($classes, Mermaid::INDENTATION) . "\n"
                     . Mermaid::INDENTATION . '}'
                 ;
+            }
+
+            foreach ($classes as $class) {
+                if ($class->hasAction()) {
+                    $this->actions[] = $class->getAction();
+                }
+                if ($class->hasNote()) {
+                    $this->notes[] = $class->getNote();
+                }
             }
         }
 
@@ -134,8 +155,12 @@ final class ClassDiagram implements MermaidInterface, Stringable
             $output[] = $this->renderItems($this->relationships, '');
         }
 
-        if ($this->note !== null) {
-            $output[] = $this->note->render(Mermaid::INDENTATION);
+        foreach ($this->notes as $note) {
+            $output[] = Mermaid::INDENTATION . $note;
+        }
+
+        foreach ($this->actions as $action) {
+            $output[] = Mermaid::INDENTATION . $action;
         }
 
         if (!empty($this->classDefs)) {

@@ -20,9 +20,10 @@ final class Classs
     public const DEFAULT_NAMESPACE = '';
     private const TYPE = 'class';
 
+    private string $action = '';
     /** @psalm-var list<Attribute|Method>  */
     private array $members = [];
-    private ?Note $note = null;
+    private string $note = '';
 
     public function __construct(
         private readonly string $name,
@@ -34,9 +35,33 @@ final class Classs
     }
 
     /** @internal */
+    public function getAction(): string
+    {
+        return $this->action;
+    }
+
+    /** @internal */
     public function getName(): string
     {
         return $this->name;
+    }
+
+    /** @internal */
+    public function getNote(): string
+    {
+        return $this->note;
+    }
+
+    /** @internal */
+    public function hasAction(): bool
+    {
+        return $this->action !== '';
+    }
+
+    /** @internal */
+    public function hasNote(): bool
+    {
+        return $this->note !== '';
     }
 
     /** @internal */
@@ -75,10 +100,23 @@ final class Classs
         return $new;
     }
 
-    public function withNote(Note $note): self
+    public function withNote(string $note): self
     {
         $new = clone $this;
-        $new->note = $note;
+        $new->note = 'note for ' . $this->name . ' "' . $note . '"';
+        return $new;
+    }
+
+    public function withAction(string $action, ActionType $type = ActionType::Link, string $tooltip = ''): self
+    {
+        $new = clone $this;
+        $new->action = 'click '
+            . $this->name
+            . ' '
+            . $type->value
+            . ' '
+            . ($type === ActionType::Callback ? $action : '"' . $action . '"')
+            . ($tooltip === '' ? '' : ' "' . $tooltip . '"');
         return $new;
     }
 
@@ -105,10 +143,6 @@ final class Classs
         }
 
         $output[] = $indentation . '}';
-
-        if ($this->note !== null) {
-            $output[] = $this->note->render($indentation, $this);
-        }
 
         return implode("\n", $output);
     }

@@ -6,6 +6,7 @@
 
 declare(strict_types=1);
 
+use BeastBytes\Mermaid\ClassDiagram\ActionType;
 use BeastBytes\Mermaid\ClassDiagram\Attribute;
 use BeastBytes\Mermaid\ClassDiagram\Classs;
 use BeastBytes\Mermaid\ClassDiagram\Method;
@@ -71,15 +72,42 @@ test('Class with label', function () {
     ;
 });
 
-test('Class with note', function () {
-    $class = (new Classs(CLASS_NAME))->withNote(new Note(NOTE));
+test('Class with action', function () {
+    $class = (new Classs(CLASS_NAME));
 
     /** @psalm-suppress InternalMethod */
-    expect($class->render(''))
-        ->toBe('class ' . CLASS_NAME . " {\n"
-            . "}\n"
-            . 'note for ' . CLASS_NAME . ' "' . NOTE . '"'
-        )
+    expect($class->hasAction())
+        ->toBeFalse()
+    ;
+
+    $class = $class->withAction('https://example.com');
+    expect($class->hasAction())
+        ->toBeTrue()
+        ->and($class->getAction())
+        ->toBe('click ' . CLASS_NAME . ' href "https://example.com"')
+    ;
+
+    $class = $class->withAction('myCallback()', ActionType::Callback);
+    expect($class->hasAction())
+        ->toBeTrue()
+        ->and($class->getAction())
+        ->toBe('click ' . CLASS_NAME . ' call myCallback()')
+    ;
+});
+
+test('Class with note', function () {
+    $class = (new Classs(CLASS_NAME));
+
+    /** @psalm-suppress InternalMethod */
+    expect($class->hasNote())
+        ->toBeFalse()
+    ;
+
+    $class = $class->withNote(NOTE);
+    expect($class->hasNote())
+        ->toBeTrue()
+        ->and($class->getNote())
+        ->toBe('note for ' . CLASS_NAME . ' "' . NOTE . '"')
     ;
 });
 
@@ -139,7 +167,7 @@ test('Class with everything', function () {
         annotation: ANNOTATION,
         label: LABEL
     ))
-        ->withNote(new Note(NOTE))
+        ->withNote(NOTE)
         ->withMember(
             new Attribute(
                 name: ATTRIBUTE_NAME,
@@ -161,8 +189,11 @@ test('Class with everything', function () {
             . '  <<' . ANNOTATION . ">>\n"
             . '  -string ' . ATTRIBUTE_NAME . "\n"
             . '  +' . METHOD_NAME . "() string\n"
-            . "}\n"
-            . 'note for ' . CLASS_NAME . ' "' . NOTE . '"'
+            . '}'
         )
+        ->and($class->hasNote())
+        ->toBeTrue()
+        ->and($class->getNote())
+        ->toBe('note for ' . CLASS_NAME . ' "' . NOTE . '"')
     ;
 });
