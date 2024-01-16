@@ -6,11 +6,10 @@
 
 declare(strict_types=1);
 
-use BeastBytes\Mermaid\ClassDiagram\ActionType;
+use BeastBytes\Mermaid\InteractionType;
 use BeastBytes\Mermaid\ClassDiagram\Attribute;
 use BeastBytes\Mermaid\ClassDiagram\Classs;
 use BeastBytes\Mermaid\ClassDiagram\Method;
-use BeastBytes\Mermaid\ClassDiagram\Note;
 use BeastBytes\Mermaid\ClassDiagram\Visibility;
 use BeastBytes\Mermaid\Mermaid;
 
@@ -18,6 +17,7 @@ const ANNOTATION = 'Annotation';
 const ATTRIBUTE_NAME = 'attribute';
 const CLASS_NAME = 'TestClass';
 const CLASS_NAMESPACE = 'ClassNamespace';
+const COMMENT = 'Class comment';
 const LABEL = 'Label';
 const METHOD_NAME = 'getAttribute';
 const NOTE = 'Note';
@@ -27,7 +27,7 @@ test('Simple class', function () {
     $class = new Classs(name:CLASS_NAME, namespace: CLASS_NAMESPACE);
 
     /** @psalm-suppress InternalMethod */
-    expect($class->getName())
+    expect($class->getId())
         ->toBe(CLASS_NAME)
         ->and($class->getNamespace())
         ->toBe(CLASS_NAMESPACE)
@@ -48,6 +48,15 @@ test('Class with annotation', function () {
                . '  <<' . ANNOTATION . ">>\n"
                . '}'
         )
+    ;
+});
+
+test('Class with comment', function () {
+    $class = (new Classs(name: CLASS_NAME))->withComment(COMMENT);
+
+    /** @psalm-suppress InternalMethod */
+    expect($class->render(''))
+        ->toBe('%% ' . COMMENT . "\nclass " . CLASS_NAME . " {\n}")
     ;
 });
 
@@ -72,41 +81,26 @@ test('Class with label', function () {
     ;
 });
 
-test('Class with action', function () {
+test('Class with interaction', function () {
     $class = (new Classs(CLASS_NAME));
+    $output = [];
 
-    /** @psalm-suppress InternalMethod */
-    expect($class->hasAction())
-        ->toBeFalse()
+    $class->withInteraction('https://example.com')->renderInteraction($output);
+    expect($output[0])
+        ->toBe('  click ' . CLASS_NAME . ' href "https://example.com"')
     ;
 
-    $class = $class->withAction('https://example.com');
-    expect($class->hasAction())
-        ->toBeTrue()
-        ->and($class->getAction())
-        ->toBe('click ' . CLASS_NAME . ' href "https://example.com"')
-    ;
-
-    $class = $class->withAction('myCallback()', ActionType::Callback);
-    expect($class->hasAction())
-        ->toBeTrue()
-        ->and($class->getAction())
-        ->toBe('click ' . CLASS_NAME . ' call myCallback()')
+    $class->withInteraction('myCallback()', InteractionType::Callback)->renderInteraction($output);
+    expect($output[1])
+        ->toBe('  click ' . CLASS_NAME . ' call myCallback()')
     ;
 });
 
 test('Class with note', function () {
-    $class = (new Classs(CLASS_NAME));
+    $output = [];
 
-    /** @psalm-suppress InternalMethod */
-    expect($class->hasNote())
-        ->toBeFalse()
-    ;
-
-    $class = $class->withNote(NOTE);
-    expect($class->hasNote())
-        ->toBeTrue()
-        ->and($class->getNote())
+    (new Classs(CLASS_NAME))->withNote(NOTE)->renderNote('', $output);
+    expect($output[0])
         ->toBe('note for ' . CLASS_NAME . ' "' . NOTE . '"')
     ;
 });
@@ -167,7 +161,6 @@ test('Class with everything', function () {
         annotation: ANNOTATION,
         label: LABEL
     ))
-        ->withNote(NOTE)
         ->withMember(
             new Attribute(
                 name: ATTRIBUTE_NAME,
@@ -181,19 +174,17 @@ test('Class with everything', function () {
             )
         )
         ->withStyleClass(STYLE_CLASS)
+        ->withComment(COMMENT)
     ;
 
     /** @psalm-suppress InternalMethod */
     expect($class->render(''))
-        ->toBe('class ' . CLASS_NAME . '["' . LABEL . '"]' . Mermaid::CLASS_OPERATOR . STYLE_CLASS . " {\n"
+        ->toBe('%% ' . COMMENT . "\n"
+            . 'class ' . CLASS_NAME . '["' . LABEL . '"]' . Mermaid::CLASS_OPERATOR . STYLE_CLASS . " {\n"
             . '  <<' . ANNOTATION . ">>\n"
             . '  -string ' . ATTRIBUTE_NAME . "\n"
             . '  +' . METHOD_NAME . "() string\n"
             . '}'
         )
-        ->and($class->hasNote())
-        ->toBeTrue()
-        ->and($class->getNote())
-        ->toBe('note for ' . CLASS_NAME . ' "' . NOTE . '"')
     ;
 });

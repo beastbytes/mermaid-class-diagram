@@ -8,19 +8,24 @@ declare(strict_types=1);
 
 namespace BeastBytes\Mermaid\ClassDiagram;
 
+use BeastBytes\Mermaid\CommentTrait;
+use BeastBytes\Mermaid\InteractionInterface;
+use BeastBytes\Mermaid\InteractionTrait;
 use BeastBytes\Mermaid\Mermaid;
+use BeastBytes\Mermaid\NodeInterface;
 use BeastBytes\Mermaid\RenderItemsTrait;
 use BeastBytes\Mermaid\StyleClassTrait;
 
-final class Classs
+final class Classs implements InteractionInterface, NodeInterface
 {
+    use CommentTrait;
+    use InteractionTrait;
     use RenderItemsTrait;
     use StyleClassTrait;
 
     public const DEFAULT_NAMESPACE = '';
     private const TYPE = 'class';
 
-    private string $action = '';
     /** @psalm-var list<Attribute|Method>  */
     private array $members = [];
     private string $note = '';
@@ -35,33 +40,9 @@ final class Classs
     }
 
     /** @internal */
-    public function getAction(): string
-    {
-        return $this->action;
-    }
-
-    /** @internal */
-    public function getName(): string
+    public function getId(): string
     {
         return $this->name;
-    }
-
-    /** @internal */
-    public function getNote(): string
-    {
-        return $this->note;
-    }
-
-    /** @internal */
-    public function hasAction(): bool
-    {
-        return $this->action !== '';
-    }
-
-    /** @internal */
-    public function hasNote(): bool
-    {
-        return $this->note !== '';
     }
 
     /** @internal */
@@ -103,20 +84,7 @@ final class Classs
     public function withNote(string $note): self
     {
         $new = clone $this;
-        $new->note = 'note for ' . $this->name . ' "' . $note . '"';
-        return $new;
-    }
-
-    public function withAction(string $action, ActionType $type = ActionType::Link, string $tooltip = ''): self
-    {
-        $new = clone $this;
-        $new->action = 'click '
-            . $this->name
-            . ' '
-            . $type->value
-            . ' '
-            . ($type === ActionType::Callback ? $action : '"' . $action . '"')
-            . ($tooltip === '' ? '' : ' "' . $tooltip . '"');
+        $new->note = $note;
         return $new;
     }
 
@@ -124,6 +92,8 @@ final class Classs
     public function render(string $indentation): string
     {
         $output = [];
+
+        $this->renderComment($indentation, $output);
 
         $output[] = $indentation
             . self::TYPE
@@ -138,12 +108,18 @@ final class Classs
             $output[] = $indentation . Mermaid::INDENTATION . '<<' . $this->annotation . '>>';
         }
 
-        if (count($this->members) > 0) {
-            $output[] = $this->renderItems($this->members, $indentation);
-        }
+        $this->renderItems($this->members, $indentation, $output);
 
         $output[] = $indentation . '}';
 
         return implode("\n", $output);
+    }
+
+    /** @internal */
+    public function renderNote(string $indentation, array &$output): void
+    {
+        if ($this->note !== '') {
+            $output[] = $indentation . 'note for ' . $this->name . ' "' . $this->note . '"';
+        }
     }
 }

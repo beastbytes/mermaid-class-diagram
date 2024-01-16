@@ -17,10 +17,8 @@ const TITLE = 'Title';
 const NOTE = 'Note';
 
 test('Simple classDiagram', function () {
-    $class = new Classs(CLASS_NAME);
-
     $diagram = (new ClassDiagram())
-        ->withClass($class)
+        ->withClass(new Classs(CLASS_NAME))
     ;
 
     expect($diagram->render())
@@ -34,10 +32,8 @@ test('Simple classDiagram', function () {
 });
 
 test('classDiagram with namespaced class', function () {
-    $class = new Classs(name: CLASS_NAME, namespace:CLASS_NAMESPACE);
-
     $diagram = (new ClassDiagram())
-        ->withClass($class)
+        ->withClass(new Classs(name: CLASS_NAME, namespace:CLASS_NAMESPACE))
     ;
 
     expect($diagram->render())
@@ -53,29 +49,26 @@ test('classDiagram with namespaced class', function () {
 });
 
 test('classDiagram with note', function () {
-    $class = new Classs(CLASS_NAME);
-
     $diagram = (new ClassDiagram())
         ->withNote(NOTE)
-        ->withClass($class)
+        ->withClass(new Classs(CLASS_NAME))
     ;
 
     expect($diagram->render())
         ->toBe("<pre class=\"mermaid\">\n"
             . "classDiagram\n"
+            . '  note &quot;' . NOTE . "&quot;\n"
             . '  class ' . CLASS_NAME . " {\n"
             . "  }\n"
-            . '  note &quot;' . NOTE . "&quot;\n"
             . '</pre>'
         )
     ;
 });
 
 test('classDiagram with title', function () {
-    $class = new Classs(CLASS_NAME);
-
-    $diagram = (new ClassDiagram(title: TITLE))
-        ->withClass($class)
+    $diagram = (new ClassDiagram())
+        ->withClass(new Classs(CLASS_NAME))
+        ->withTitle(TITLE)
     ;
 
     expect($diagram->render())
@@ -92,11 +85,11 @@ test('classDiagram with title', function () {
 });
 
 test('classDiagram with relationship', function (RelationshipType $relationship) {
-    $class1 = new Classs(CLASS_NAME . '1');
-    $class2 = new Classs(CLASS_NAME . '2');
-
     $diagram = (new ClassDiagram())
-        ->withClass($class1, $class2)
+        ->withClass(
+            $class1 = new Classs(CLASS_NAME . '1'),
+            $class2 = new Classs(CLASS_NAME . '2')
+        )
         ->withRelationship(new Relationship($class1, $class2, $relationship))
     ;
 
@@ -116,41 +109,30 @@ test('classDiagram with relationship', function (RelationshipType $relationship)
 ;
 
 test('classDiagram with everything', function () {
-    $class1 = (new Classs(name: CLASS_NAME . '1', namespace: CLASS_NAMESPACE . '1'))
-        ->withStyleClass('classDef0')
-    ;
-    $class2 = (new Classs(name: CLASS_NAME . '2', namespace: CLASS_NAMESPACE . '1'))
-        ->withStyleClass('classDef2')
-        ->withNote("Class 2 note")
-        ->withAction('https://example.com')
-    ;
-    $class3 = (new Classs(name: CLASS_NAME . '3', namespace: CLASS_NAMESPACE . '2'))
-        ->withStyleClass('classDef1')
-        ->withNote("Class 3 note")
-    ;
-    $class4 = (new Classs(name: CLASS_NAME . '4', namespace: CLASS_NAMESPACE . '2'))
-        ->withAction('https://example.com')
-    ;
-
-    $diagram = (new ClassDiagram(title: TITLE))
+    $diagram = (new ClassDiagram())
         ->withNote(NOTE)
-        ->withClass($class1, $class2, $class3, $class4)
+        ->withTitle(TITLE)
+        ->withClass(
+            $class1 = (new Classs(name: CLASS_NAME . '1', namespace: CLASS_NAMESPACE . '1'))
+                ->withStyleClass('classDef0')
+            ,
+            $class2 = (new Classs(name: CLASS_NAME . '2', namespace: CLASS_NAMESPACE . '1'))
+                ->withStyleClass('classDef2')
+                ->withNote("Class 2 note")
+                ->withInteraction('https://example.com')
+            ,
+            $class3 = (new Classs(name: CLASS_NAME . '3', namespace: CLASS_NAMESPACE . '2'))
+                ->withStyleClass('classDef1')
+                ->withNote("Class 3 note")
+            ,
+            $class4 = (new Classs(name: CLASS_NAME . '4', namespace: CLASS_NAMESPACE . '2'))
+                ->withInteraction('https://example.com')
+        )
         ->withRelationship(
             new Relationship($class1, $class2, RelationshipType::Inheritance),
             new Relationship($class2, $class3, RelationshipType::Inheritance),
             new Relationship($class2, $class4, RelationshipType::Inheritance)
         )
-        ->withClassDef([
-            'classDef0' => 'fill:white',
-            'classDef1' => ['font-style' => 'italic']
-        ])
-        ->addClassDef(['classDef2' => [
-            'fill' => '#f00',
-            'color' => 'white',
-            'font-weight' => 'bold',
-            'stroke-width' => '2px',
-            'stroke' => 'yellow'
-        ]])
     ;
 
     expect($diagram->render())
@@ -159,29 +141,26 @@ test('classDiagram with everything', function () {
             . 'title: ' . TITLE . "\n"
             . "---\n"
             . "classDiagram\n"
+            . '  note &quot;' . NOTE . "&quot;\n"
             . '  namespace ' . CLASS_NAMESPACE . "1 {\n"
             . '    class ' . CLASS_NAME . "1:::classDef0 {\n"
             . "    }\n"
             . '    class ' . CLASS_NAME . "2:::classDef2 {\n"
             . "    }\n"
             . "  }\n"
+            . "  note for TestClass2 &quot;Class 2 note&quot;\n"
+            . "  click TestClass2 href &quot;https://example.com&quot;\n"
             . '  namespace ' . CLASS_NAMESPACE . "2 {\n"
             . '    class ' . CLASS_NAME . "3:::classDef1 {\n"
             . "    }\n"
             . '    class ' . CLASS_NAME . "4 {\n"
             . "    }\n"
             . "  }\n"
+            . "  note for TestClass3 &quot;Class 3 note&quot;\n"
+            . "  click TestClass4 href &quot;https://example.com&quot;\n"
             . '  ' . CLASS_NAME . '1 --|&gt; ' . CLASS_NAME . "2\n"
             . '  ' . CLASS_NAME . '2 --|&gt; ' . CLASS_NAME . "3\n"
             . '  ' . CLASS_NAME . '2 --|&gt; ' . CLASS_NAME . "4\n"
-            . '  note &quot;' . NOTE . "&quot;\n"
-            . "  note for TestClass2 &quot;Class 2 note&quot;\n"
-            . "  note for TestClass3 &quot;Class 3 note&quot;\n"
-            . "  click TestClass2 href &quot;https://example.com&quot;\n"
-            . "  click TestClass4 href &quot;https://example.com&quot;\n"
-            . "  classDef classDef0 fill:white;\n"
-            . "  classDef classDef1 font-style:italic;\n"
-            . "  classDef classDef2 fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow;\n"
             . '</pre>'
         )
     ;

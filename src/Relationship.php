@@ -25,13 +25,13 @@ final class Relationship
     public function render(string $indentation): string
     {
         return $indentation
-            . $this->classA->getName()
+            . $this->classA->getId()
             . ' '
             . ($this->cardinalityA === null ? '' : '"' . $this->cardinalityA->value . '" ')
             . $this->type->value
             . ' '
             . ($this->cardinalityB === null ? '' : '"' . $this->cardinalityB->value . '" ')
-            . $this->classB->getName()
+            . $this->classB->getId()
             . ($this->label === null ? '' : ' : ' . $this->label)
         ;
     }
