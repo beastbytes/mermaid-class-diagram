@@ -12,9 +12,9 @@ use BeastBytes\Mermaid\ClassDiagram\Relationship;
 use BeastBytes\Mermaid\ClassDiagram\RelationshipType;
 use BeastBytes\Mermaid\Mermaid;
 
-const CLASS_A_NAME = 'ClassA';
-const CLASS_B_NAME = 'ClassB';
-const LABEL = 'Label';
+defined('CLASS_A_NAME') or define('CLASS_A_NAME', 'ClassA');
+defined('CLASS_B_NAME') or define('CLASS_B_NAME', 'ClassB');
+defined('LABEL') or define('LABEL', 'Label');
 
 test('Simple relationship', function (RelationshipType $type) {
     $classA = new Classs(CLASS_A_NAME);

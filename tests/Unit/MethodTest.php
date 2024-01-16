@@ -9,7 +9,7 @@ declare(strict_types=1);
 use BeastBytes\Mermaid\ClassDiagram\Method;
 use BeastBytes\Mermaid\ClassDiagram\Visibility;
 
-const NAME = 'TestMethod';
+defined('NAME') or define('NAME', 'Name');
 
 test('Simple method', function () {
     $method = new Method(NAME);

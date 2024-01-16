@@ -9,7 +9,7 @@ declare(strict_types=1);
 use BeastBytes\Mermaid\ClassDiagram\Attribute;
 use BeastBytes\Mermaid\ClassDiagram\Visibility;
 
-const NAME = 'TestAttribute';
+defined('NAME') or define('NAME', 'Name');
 
 test('Simple attribute', function () {
     $attribute = new Attribute(NAME);

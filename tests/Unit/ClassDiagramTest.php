@@ -11,20 +11,20 @@ use BeastBytes\Mermaid\ClassDiagram\Classs;
 use BeastBytes\Mermaid\ClassDiagram\Relationship;
 use BeastBytes\Mermaid\ClassDiagram\RelationshipType;
 
-const CLASS_NAME = 'TestClass';
-const CLASS_NAMESPACE = 'ClassNamespace';
-const TITLE = 'Title';
-const NOTE = 'Note';
+defined('NAME') or define('NAME', 'Name');
+defined('CLASS_NAMESPACE') or define('CLASS_NAMESPACE', 'Namespace');
+defined('TITLE') or define('TITLE', 'Title');
+defined('NOTE') or define('NOTE', 'Note');
 
 test('Simple classDiagram', function () {
     $diagram = (new ClassDiagram())
-        ->withClass(new Classs(CLASS_NAME))
+        ->withClass(new Classs(NAME))
     ;
 
     expect($diagram->render())
         ->toBe("<pre class=\"mermaid\">\n"
             . "classDiagram\n"
-            . '  class ' . CLASS_NAME . " {\n"
+            . '  class ' . NAME . " {\n"
             . "  }\n"
             . '</pre>'
         )
@@ -33,14 +33,14 @@ test('Simple classDiagram', function () {
 
 test('classDiagram with namespaced class', function () {
     $diagram = (new ClassDiagram())
-        ->withClass(new Classs(name: CLASS_NAME, namespace:CLASS_NAMESPACE))
+        ->withClass(new Classs(name: NAME, namespace:CLASS_NAMESPACE))
     ;
 
     expect($diagram->render())
         ->toBe("<pre class=\"mermaid\">\n"
             . "classDiagram\n"
             . '  namespace ' . CLASS_NAMESPACE . " {\n"
-            . '    class ' . CLASS_NAME . " {\n"
+            . '    class ' . NAME . " {\n"
             . "    }\n"
            . "  }\n"
             . '</pre>'
@@ -51,14 +51,14 @@ test('classDiagram with namespaced class', function () {
 test('classDiagram with note', function () {
     $diagram = (new ClassDiagram())
         ->withNote(NOTE)
-        ->withClass(new Classs(CLASS_NAME))
+        ->withClass(new Classs(NAME))
     ;
 
     expect($diagram->render())
         ->toBe("<pre class=\"mermaid\">\n"
             . "classDiagram\n"
             . '  note &quot;' . NOTE . "&quot;\n"
-            . '  class ' . CLASS_NAME . " {\n"
+            . '  class ' . NAME . " {\n"
             . "  }\n"
             . '</pre>'
         )
@@ -67,7 +67,7 @@ test('classDiagram with note', function () {
 
 test('classDiagram with title', function () {
     $diagram = (new ClassDiagram())
-        ->withClass(new Classs(CLASS_NAME))
+        ->withClass(new Classs(NAME))
         ->withTitle(TITLE)
     ;
 
@@ -77,7 +77,7 @@ test('classDiagram with title', function () {
             . 'title: ' . TITLE . "\n"
             . "---\n"
             . "classDiagram\n"
-            . '  class ' . CLASS_NAME . " {\n"
+            . '  class ' . NAME . " {\n"
             . "  }\n"
             . '</pre>'
         )
@@ -87,8 +87,8 @@ test('classDiagram with title', function () {
 test('classDiagram with relationship', function (RelationshipType $relationship) {
     $diagram = (new ClassDiagram())
         ->withClass(
-            $class1 = new Classs(CLASS_NAME . '1'),
-            $class2 = new Classs(CLASS_NAME . '2')
+            $class1 = new Classs(NAME . '1'),
+            $class2 = new Classs(NAME . '2')
         )
         ->withRelationship(new Relationship($class1, $class2, $relationship))
     ;
@@ -96,11 +96,11 @@ test('classDiagram with relationship', function (RelationshipType $relationship)
     expect($diagram->render())
         ->toBe("<pre class=\"mermaid\">\n"
             . "classDiagram\n"
-            . '  class ' . CLASS_NAME . "1 {\n"
+            . '  class ' . NAME . "1 {\n"
             . "  }\n"
-            . '  class ' . CLASS_NAME . "2 {\n"
+            . '  class ' . NAME . "2 {\n"
             . "  }\n"
-            . '  ' . CLASS_NAME . '1 ' . htmlspecialchars($relationship->value) . ' ' . CLASS_NAME . "2\n"
+            . '  ' . NAME . '1 ' . htmlspecialchars($relationship->value) . ' ' . NAME . "2\n"
             . '</pre>'
         )
     ;
@@ -113,19 +113,20 @@ test('classDiagram with everything', function () {
         ->withNote(NOTE)
         ->withTitle(TITLE)
         ->withClass(
-            $class1 = (new Classs(name: CLASS_NAME . '1', namespace: CLASS_NAMESPACE . '1'))
+            $class1 = (new Classs(name: NAME . '1', namespace: CLASS_NAMESPACE . '1'))
                 ->withStyleClass('classDef0')
             ,
-            $class2 = (new Classs(name: CLASS_NAME . '2', namespace: CLASS_NAMESPACE . '1'))
+            $class2 = (new Classs(name: NAME . '2', namespace: CLASS_NAMESPACE . '1'))
                 ->withStyleClass('classDef2')
                 ->withNote("Class 2 note")
                 ->withInteraction('https://example.com')
             ,
-            $class3 = (new Classs(name: CLASS_NAME . '3', namespace: CLASS_NAMESPACE . '2'))
+            $class3 = (new Classs(name: NAME . '3', namespace: CLASS_NAMESPACE . '2'))
                 ->withStyleClass('classDef1')
                 ->withNote("Class 3 note")
+                ->withInteraction('callback()')
             ,
-            $class4 = (new Classs(name: CLASS_NAME . '4', namespace: CLASS_NAMESPACE . '2'))
+            $class4 = (new Classs(name: NAME . '4', namespace: CLASS_NAMESPACE . '2'))
                 ->withInteraction('https://example.com')
         )
         ->withRelationship(
@@ -143,24 +144,25 @@ test('classDiagram with everything', function () {
             . "classDiagram\n"
             . '  note &quot;' . NOTE . "&quot;\n"
             . '  namespace ' . CLASS_NAMESPACE . "1 {\n"
-            . '    class ' . CLASS_NAME . "1:::classDef0 {\n"
+            . '    class ' . NAME . "1:::classDef0 {\n"
             . "    }\n"
-            . '    class ' . CLASS_NAME . "2:::classDef2 {\n"
+            . '    class ' . NAME . "2:::classDef2 {\n"
             . "    }\n"
             . "  }\n"
-            . "  note for TestClass2 &quot;Class 2 note&quot;\n"
-            . "  click TestClass2 href &quot;https://example.com&quot;\n"
+            . '  note for ' . NAME . "2 &quot;Class 2 note&quot;\n"
+            . '  click ' . NAME . "2 href &quot;https://example.com&quot; _self\n"
             . '  namespace ' . CLASS_NAMESPACE . "2 {\n"
-            . '    class ' . CLASS_NAME . "3:::classDef1 {\n"
+            . '    class ' . NAME . "3:::classDef1 {\n"
             . "    }\n"
-            . '    class ' . CLASS_NAME . "4 {\n"
+            . '    class ' . NAME . "4 {\n"
             . "    }\n"
             . "  }\n"
-            . "  note for TestClass3 &quot;Class 3 note&quot;\n"
-            . "  click TestClass4 href &quot;https://example.com&quot;\n"
-            . '  ' . CLASS_NAME . '1 --|&gt; ' . CLASS_NAME . "2\n"
-            . '  ' . CLASS_NAME . '2 --|&gt; ' . CLASS_NAME . "3\n"
-            . '  ' . CLASS_NAME . '2 --|&gt; ' . CLASS_NAME . "4\n"
+            . '  note for ' . NAME . "3 &quot;Class 3 note&quot;\n"
+            . '  click ' . NAME . "3 call callback()\n"
+            . '  click ' . NAME . "4 href &quot;https://example.com&quot; _self\n"
+            . '  ' . NAME . '1 --|&gt; ' . NAME . "2\n"
+            . '  ' . NAME . '2 --|&gt; ' . NAME . "3\n"
+            . '  ' . NAME . '2 --|&gt; ' . NAME . "4\n"
             . '</pre>'
         )
     ;
