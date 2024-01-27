@@ -112,7 +112,7 @@ final class ClassDiagram implements MermaidInterface, Stringable
         return $new;
     }
 
-    public function render(): string
+    public function render(array $attributes = []): string
     {
         $output = [];
 
@@ -139,7 +139,7 @@ final class ClassDiagram implements MermaidInterface, Stringable
 
         $this->renderItems($this->relationships, '', $output);
 
-        return Mermaid::render($output);
+        return Mermaid::render($output, $attributes);
     }
 
     private function renderNotes(array $classes, &$output): void
