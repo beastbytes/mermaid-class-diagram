@@ -39,8 +39,7 @@ final class Classs implements InteractionInterface, NodeInterface
     {
     }
 
-    /** @internal */
-    public function getId(): string
+    public function getName(): string
     {
         return $this->name;
     }

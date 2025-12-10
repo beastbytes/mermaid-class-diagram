@@ -27,7 +27,7 @@ test('Simple class', function () {
     $class = new Classs(name:NAME, namespace: CLASS_NAMESPACE);
 
     /** @psalm-suppress InternalMethod */
-    expect($class->getId())
+    expect($class->getName())
         ->toBe(NAME)
         ->and($class->getNamespace())
         ->toBe(CLASS_NAMESPACE)

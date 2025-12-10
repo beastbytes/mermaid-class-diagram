@@ -23,7 +23,7 @@ test('Simple relationship', function (RelationshipType $type) {
     $relationship = new Relationship($classA, $classB, $type);
 
     expect($relationship->render(''))
-        ->toBe($classA->getId() . ' ' . $type->value . ' ' . $classB->getId())
+        ->toBe($classA->getName() . ' ' . $type->value . ' ' . $classB->getName())
     ;
 })
     ->with('relationshipType')
@@ -36,9 +36,9 @@ test('Relationship with label', function () {
     $relationship = new Relationship($classA, $classB, RelationshipType::Inheritance, LABEL);
 
     expect($relationship->render(''))
-        ->toBe($classA->getId()
+        ->toBe($classA->getName()
             . ' ' . RelationshipType::Inheritance->value
-            . ' ' . $classB->getId()
+            . ' ' . $classB->getName()
             . ' : ' . LABEL
         )
     ;
@@ -58,11 +58,11 @@ test('Relationship with cardinality', function ($type, $cardinalityA , $cardinal
 );
 
     expect($relationship->render(''))
-        ->toBe($classA->getId()
+        ->toBe($classA->getName()
             . ' "' . $cardinalityA->value . '"'
             . ' ' . $type->value
             . ' "' . $cardinalityB->value . '"'
-            . ' ' . $classB->getId()
+            . ' ' . $classB->getName()
             . ' : ' . LABEL
     );
 })
