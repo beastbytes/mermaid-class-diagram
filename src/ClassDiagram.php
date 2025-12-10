@@ -45,7 +45,7 @@ final class ClassDiagram implements MermaidInterface, Stringable
     }
 
     /**
-     * Add one or many relationships to the current set
+     * Add one or many classes to the current set
      *
      * @param Classs ...$class One or many classes
      * @return ClassDiagram
