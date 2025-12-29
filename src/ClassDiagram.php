@@ -1,29 +1,22 @@
 <?php
-/**
- * @copyright Copyright © 2023 BeastBytes - All rights reserved
- * @license BSD 3-Clause
- */
 
 declare(strict_types=1);
 
 namespace BeastBytes\Mermaid\ClassDiagram;
 
 use BeastBytes\Mermaid\CommentTrait;
+use BeastBytes\Mermaid\Diagram;
 use BeastBytes\Mermaid\InteractionRendererTrait;
 use BeastBytes\Mermaid\Mermaid;
-use BeastBytes\Mermaid\MermaidInterface;
 use BeastBytes\Mermaid\RenderItemsTrait;
-use BeastBytes\Mermaid\TitleTrait;
-use Stringable;
 
-final class ClassDiagram implements MermaidInterface, Stringable
+final class ClassDiagram extends Diagram
 {
     use CommentTrait;
     use InteractionRendererTrait;
     use RenderItemsTrait;
-    use TitleTrait;
 
-    private const TYPE = 'classDiagram';
+    private const string TYPE = 'classDiagram';
 
     /**
      * @psalm-var list<string> $actions
@@ -37,15 +30,10 @@ final class ClassDiagram implements MermaidInterface, Stringable
      * @var Relationship[] $relationships
      */
     private array $relationships = [];
-    private string $note = '';
-
-    public function __toString(): string
-    {
-        return $this->render();
-    }
+    private ?string $note = null;
 
     /**
-     * Add one or many relationships to the current set
+     * Add one or many classes to the current set
      *
      * @param Classs ...$class One or many classes
      * @return ClassDiagram
@@ -112,41 +100,51 @@ final class ClassDiagram implements MermaidInterface, Stringable
         return $new;
     }
 
-    public function render(array $attributes = []): string
+    private function renderNote(string $indentation): string
+    {
+        return is_string($this->note)
+            ? $indentation . 'note "' . $this->note . '"'
+            : ''
+        ;
+    }
+
+    protected function renderDiagram(): string
     {
         $output = [];
 
-        $this->renderTitle($output);
-        $this->renderComment('', $output);
-
+        $output[] = $this->renderComment('');
         $output[] = self::TYPE;
-
-        if ($this->note !== '') {
-            $output[] = Mermaid::INDENTATION . 'note "' . $this->note . '"';
-        }
+        $output[] = $this->renderNote(Mermaid::INDENTATION);
 
         foreach ($this->classes as $namespace => $classes) {
             if ($namespace === Classs::DEFAULT_NAMESPACE) {
-                $this->renderItems($classes, '', $output);
+                $output[] = $this->renderItems($classes, '');
             } else {
                 $output[] = Mermaid::INDENTATION . "namespace $namespace {";
-                $this->renderItems($classes, Mermaid::INDENTATION, $output);
+                $output[] = $this->renderItems($classes, Mermaid::INDENTATION);
                 $output[] = Mermaid::INDENTATION . '}';
             }
-            $this->renderNotes($classes, $output);
-            $this->renderInteractions($classes, $output);
+
+            $output[] = $this->renderNotes($classes);
+            $output[] = $this->renderInteractions($classes);
         }
 
-        $this->renderItems($this->relationships, '', $output);
+        $output[] = $this->renderItems($this->relationships, '');
 
-        return Mermaid::render($output, $attributes);
+        return implode("\n", array_filter($output, fn($v) => $v !== ''));
     }
 
-    private function renderNotes(array $classes, &$output): void
+    private function renderNotes(array $classes): string
     {
+        $notes = [];
+
         /** @var Classs $class */
         foreach ($classes as $class) {
-            $class->renderNote(Mermaid::INDENTATION, $output);
+            if ($class->hasNote()) {
+                $notes[] = $class->renderNote(Mermaid::INDENTATION);
+            }
         }
+
+        return implode("\n", $notes);
     }
 }

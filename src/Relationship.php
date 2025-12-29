@@ -1,22 +1,18 @@
 <?php
-/**
- * @copyright Copyright © 2023 BeastBytes - All rights reserved
- * @license BSD 3-Clause
- */
 
 declare(strict_types=1);
 
 namespace BeastBytes\Mermaid\ClassDiagram;
 
-final class Relationship
+final readonly class Relationship
 {
     public function __construct(
-        private readonly Classs $classA,
-        private readonly Classs $classB,
-        private readonly RelationshipType $type,
-        private readonly ?string $label = null,
-        private readonly ?Cardinality $cardinalityA = null,
-        private readonly ?Cardinality $cardinalityB = null
+        private Classs $classA,
+        private Classs $classB,
+        private RelationshipType $type,
+        private ?string $label = null,
+        private ?Cardinality $cardinalityA = null,
+        private ?Cardinality $cardinalityB = null
     )
     {
     }

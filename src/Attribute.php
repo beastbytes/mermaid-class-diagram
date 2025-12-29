@@ -1,19 +1,15 @@
 <?php
-/**
- * @copyright Copyright © 2023 BeastBytes - All rights reserved
- * @license BSD 3-Clause
- */
 
 declare(strict_types=1);
 
 namespace BeastBytes\Mermaid\ClassDiagram;
 
-final class Attribute
+final readonly class Attribute
 {
     public function __construct(
-        private readonly string $name,
-        private readonly ?string $type = null,
-        private readonly ?Visibility $visibility = null
+        private string $name,
+        private ?string $type = null,
+        private ?Visibility $visibility = null
     )
     {
     }

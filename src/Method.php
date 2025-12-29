@@ -1,20 +1,16 @@
 <?php
-/**
- * @copyright Copyright © 2023 BeastBytes - All rights reserved
- * @license BSD 3-Clause
- */
 
 declare(strict_types=1);
 
 namespace BeastBytes\Mermaid\ClassDiagram;
 
-final class Method
+final readonly class Method
 {
     public function __construct(
-        private readonly string $name,
-        private readonly array $parameters = [],
-        private readonly ?string $returnType = null,
-        private readonly ?Visibility $visibility = null
+        private string $name,
+        private array $parameters = [],
+        private ?string $returnType = null,
+        private ?Visibility $visibility = null
     )
     {
     }

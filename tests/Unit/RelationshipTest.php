@@ -1,8 +1,4 @@
 <?php
-/**
- * @copyright Copyright © 2023 BeastBytes - All rights reserved
- * @license BSD 3-Clause
- */
 
 declare(strict_types=1);
 
@@ -33,11 +29,11 @@ test('Relationship with label', function () {
     $classA = new Classs(CLASS_A_NAME);
     $classB = new Classs(CLASS_B_NAME);
 
-    $relationship = new Relationship($classA, $classB, RelationshipType::Inheritance, LABEL);
+    $relationship = new Relationship($classA, $classB, RelationshipType::inheritance, LABEL);
 
     expect($relationship->render(''))
         ->toBe($classA->getName()
-            . ' ' . RelationshipType::Inheritance->value
+            . ' ' . RelationshipType::inheritance->value
             . ' ' . $classB->getName()
             . ' : ' . LABEL
         )
@@ -72,22 +68,22 @@ test('Relationship with cardinality', function ($type, $cardinalityA , $cardinal
 ;
 
 dataset('cardinality', [
-    Cardinality::Many,
-    Cardinality::N,
-    Cardinality::OneOrMore,
-    Cardinality::OneToN,
-    Cardinality::Only1,
-    Cardinality::ZeroOrOne,
-    Cardinality::ZeroToN,
+    Cardinality::many,
+    Cardinality::n,
+    Cardinality::oneOrMore,
+    Cardinality::oneToN,
+    Cardinality::only1,
+    Cardinality::zeroOrOne,
+    Cardinality::zeroToN,
 ]);
 
 dataset('relationshipType', [
-    RelationshipType::Aggregation,
-    RelationshipType::Association,
-    RelationshipType::Composition,
-    RelationshipType::DashedLink,
-    RelationshipType::Dependency,
-    RelationshipType::Inheritance,
-    RelationshipType::Realization,
-    RelationshipType::SolidLink,
+    RelationshipType::aggregation,
+    RelationshipType::association,
+    RelationshipType::composition,
+    RelationshipType::dashedLink,
+    RelationshipType::dependency,
+    RelationshipType::inheritance,
+    RelationshipType::realization,
+    RelationshipType::solidLink,
 ]);

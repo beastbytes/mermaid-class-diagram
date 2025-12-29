@@ -1,53 +1,55 @@
 <?php
-/**
- * @copyright Copyright © 2023 BeastBytes - All rights reserved
- * @license BSD 3-Clause
- */
 
 declare(strict_types=1);
 
 namespace BeastBytes\Mermaid\ClassDiagram;
 
 use BeastBytes\Mermaid\CommentTrait;
+use BeastBytes\Mermaid\IdTrait;
 use BeastBytes\Mermaid\InteractionInterface;
 use BeastBytes\Mermaid\InteractionTrait;
 use BeastBytes\Mermaid\Mermaid;
-use BeastBytes\Mermaid\NodeInterface;
 use BeastBytes\Mermaid\RenderItemsTrait;
 use BeastBytes\Mermaid\StyleClassTrait;
 
-final class Classs implements InteractionInterface, NodeInterface
+final class Classs implements InteractionInterface
 {
     use CommentTrait;
+    use IdTrait;
     use InteractionTrait;
     use RenderItemsTrait;
     use StyleClassTrait;
 
-    public const DEFAULT_NAMESPACE = '';
-    private const TYPE = 'class';
+    public const string DEFAULT_NAMESPACE = '';
+    private const string ANNOTATION = '<<%s>>';
+    private const string LABEL = '["%s"]';
+    private const string NOTE = 'note for %s "%s"';
+    private const string TYPE = 'class';
 
-    /** @psalm-var list<Attribute|Method>  */
+    /** @psalm-var list<Attribute|Method> */
     private array $members = [];
-    private string $note = '';
+    private ?string $note = null;
 
     public function __construct(
-        private readonly string $name,
-        private readonly string $annotation = '',
-        private readonly string $label = '',
-        private readonly string $namespace = self::DEFAULT_NAMESPACE
+        string $name,
+        private readonly ?string $annotation = null,
+        private readonly ?string $label = null,
+        private readonly ?string $namespace = null
     )
     {
+        $this->id = $name;
     }
 
+    /** @internal */
     public function getName(): string
     {
-        return $this->name;
+        return $this->getId();
     }
 
     /** @internal */
     public function getNamespace(): string
     {
-        return $this->namespace;
+        return is_string($this->namespace) ? $this->namespace : self::DEFAULT_NAMESPACE;
     }
 
     /**
@@ -92,33 +94,33 @@ final class Classs implements InteractionInterface, NodeInterface
     {
         $output = [];
 
-        $this->renderComment($indentation, $output);
-
+        $output[] = $this->renderComment($indentation);
         $output[] = $indentation
             . self::TYPE
             . ' '
-            . $this->name
-            . ($this->label === '' ? '' : '["' . $this->label . '"]')
+            . $this->getId()
+            . (is_string($this->label) ? sprintf(self::LABEL, $this->label) : '')
             . $this->getStyleClass()
-            . ' {'
+            . ' {';
+        $output[] = is_string($this->annotation)
+            ? $indentation . Mermaid::INDENTATION . sprintf(self::ANNOTATION, $this->annotation)
+            : ''
         ;
-
-        if ($this->annotation !== '') {
-            $output[] = $indentation . Mermaid::INDENTATION . '<<' . $this->annotation . '>>';
-        }
-
-        $this->renderItems($this->members, $indentation, $output);
-
+        $output[] = $this->renderItems($this->members, $indentation);
         $output[] = $indentation . '}';
 
-        return implode("\n", $output);
+        return implode("\n", array_filter($output, fn($v) => !empty($v)));
     }
 
     /** @internal */
-    public function renderNote(string $indentation, array &$output): void
+    public function hasNote(): bool
     {
-        if ($this->note !== '') {
-            $output[] = $indentation . 'note for ' . $this->name . ' "' . $this->note . '"';
-        }
+        return is_string($this->note);
+    }
+
+    /** @internal */
+    public function renderNote(string $indentation): ?string
+    {
+        return is_string($this->note) ? $indentation . sprintf(self::NOTE, $this->getId(), $this->note) : null;
     }
 }

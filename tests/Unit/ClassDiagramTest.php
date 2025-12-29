@@ -1,11 +1,9 @@
 <?php
-/**
- * @copyright Copyright © 2023 BeastBytes - All rights reserved
- * @license BSD 3-Clause
- */
 
 declare(strict_types=1);
 
+use BeastBytes\Mermaid\InteractionType;
+use BeastBytes\Mermaid\Mermaid;
 use BeastBytes\Mermaid\ClassDiagram\ClassDiagram;
 use BeastBytes\Mermaid\ClassDiagram\Classs;
 use BeastBytes\Mermaid\ClassDiagram\Relationship;
@@ -17,91 +15,98 @@ defined('TITLE') or define('TITLE', 'Title');
 defined('NOTE') or define('NOTE', 'Note');
 
 test('Simple classDiagram', function () {
-    $diagram = (new ClassDiagram())
+    $diagram = Mermaid::create(ClassDiagram::class)
         ->withClass(new Classs(NAME))
     ;
 
     expect($diagram->render())
-        ->toBe("<pre class=\"mermaid\">\n"
-            . "classDiagram\n"
-            . '  class ' . NAME . " {\n"
-            . "  }\n"
-            . '</pre>'
+        ->toBe(<<<EXPECTED
+<pre class="mermaid">
+classDiagram
+  class Name {
+  }
+</pre>
+EXPECTED
         )
     ;
 });
 
 test('classDiagram with namespaced class', function () {
-    $diagram = (new ClassDiagram())
+    expect(Mermaid::create(ClassDiagram::class)
         ->withClass(new Classs(name: NAME, namespace:CLASS_NAMESPACE))
-    ;
-
-    expect($diagram->render())
-        ->toBe("<pre class=\"mermaid\">\n"
-            . "classDiagram\n"
-            . '  namespace ' . CLASS_NAMESPACE . " {\n"
-            . '    class ' . NAME . " {\n"
-            . "    }\n"
-           . "  }\n"
-            . '</pre>'
+        ->render()
+    )
+        ->toBe(<<<EXPECTED
+<pre class="mermaid">
+classDiagram
+  namespace Namespace {
+    class Name {
+    }
+  }
+</pre>
+EXPECTED
         )
     ;
 });
 
 test('classDiagram with note', function () {
-    $diagram = (new ClassDiagram())
+    expect(Mermaid::create(ClassDiagram::class)
         ->withNote(NOTE)
         ->withClass(new Classs(NAME))
-    ;
-
-    expect($diagram->render())
-        ->toBe("<pre class=\"mermaid\">\n"
-            . "classDiagram\n"
-            . '  note &quot;' . NOTE . "&quot;\n"
-            . '  class ' . NAME . " {\n"
-            . "  }\n"
-            . '</pre>'
+        ->render()
+    )
+        ->toBe(<<<EXPECTED
+<pre class="mermaid">
+classDiagram
+  note &quot;Note&quot;
+  class Name {
+  }
+</pre>
+EXPECTED
         )
     ;
 });
 
 test('classDiagram with title', function () {
-    $diagram = (new ClassDiagram())
+    expect(Mermaid::create(ClassDiagram::class, ['title' => TITLE])
         ->withClass(new Classs(NAME))
-        ->withTitle(TITLE)
-    ;
-
-    expect($diagram->render())
-        ->toBe("<pre class=\"mermaid\">\n"
-            . "---\n"
-            . 'title: ' . TITLE . "\n"
-            . "---\n"
-            . "classDiagram\n"
-            . '  class ' . NAME . " {\n"
-            . "  }\n"
-            . '</pre>'
+        ->render()
+    )
+        ->toBe(<<<EXPECTED
+<pre class="mermaid">
+---
+title: Title
+---
+classDiagram
+  class Name {
+  }
+</pre>
+EXPECTED
         )
     ;
 });
 
 test('classDiagram with relationship', function (RelationshipType $relationship) {
-    $diagram = (new ClassDiagram())
+    $rv = htmlspecialchars($relationship->value);
+
+    expect(Mermaid::create(ClassDiagram::class)
         ->withClass(
             $class1 = new Classs(NAME . '1'),
             $class2 = new Classs(NAME . '2')
         )
         ->withRelationship(new Relationship($class1, $class2, $relationship))
-    ;
-
-    expect($diagram->render())
-        ->toBe("<pre class=\"mermaid\">\n"
-            . "classDiagram\n"
-            . '  class ' . NAME . "1 {\n"
-            . "  }\n"
-            . '  class ' . NAME . "2 {\n"
-            . "  }\n"
-            . '  ' . NAME . '1 ' . htmlspecialchars($relationship->value) . ' ' . NAME . "2\n"
-            . '</pre>'
+        ->render()
+    )
+        ->toBe(<<<EXPECTED
+<pre class="mermaid">
+classDiagram
+  class Name1 {
+  }
+  class Name2 {
+  }
+  Name1 $rv Name2
+</pre>
+EXPECTED
         )
     ;
 })
@@ -109,72 +114,72 @@ test('classDiagram with relationship', function (RelationshipType $relationship)
 ;
 
 test('classDiagram with everything', function () {
-    $diagram = (new ClassDiagram())
+    expect(Mermaid::create(ClassDiagram::class, ['title' => TITLE])
         ->withNote(NOTE)
-        ->withTitle(TITLE)
         ->withClass(
             $class1 = (new Classs(name: NAME . '1', namespace: CLASS_NAMESPACE . '1'))
                 ->withStyleClass('classDef0')
             ,
             $class2 = (new Classs(name: NAME . '2', namespace: CLASS_NAMESPACE . '1'))
                 ->withStyleClass('classDef2')
-                ->withNote("Class 2 note")
-                ->withInteraction('https://example.com')
+                ->withNote('Class 2 note')
+                ->withInteraction('https://example.com', InteractionType::Link)
             ,
             $class3 = (new Classs(name: NAME . '3', namespace: CLASS_NAMESPACE . '2'))
                 ->withStyleClass('classDef1')
-                ->withNote("Class 3 note")
-                ->withInteraction('callback()')
+                ->withNote('Class 3 note')
+                ->withInteraction('callback()', InteractionType::Callback)
             ,
             $class4 = (new Classs(name: NAME . '4', namespace: CLASS_NAMESPACE . '2'))
-                ->withInteraction('https://example.com')
+                ->withInteraction('https://example.com', InteractionType::Link)
         )
         ->withRelationship(
-            new Relationship($class1, $class2, RelationshipType::Inheritance),
-            new Relationship($class2, $class3, RelationshipType::Inheritance),
-            new Relationship($class2, $class4, RelationshipType::Inheritance)
+            new Relationship($class1, $class2, RelationshipType::inheritance),
+            new Relationship($class2, $class3, RelationshipType::inheritance),
+            new Relationship($class2, $class4, RelationshipType::inheritance)
         )
-    ;
-
-    expect($diagram->render())
-        ->toBe("<pre class=\"mermaid\">\n"
-            . "---\n"
-            . 'title: ' . TITLE . "\n"
-            . "---\n"
-            . "classDiagram\n"
-            . '  note &quot;' . NOTE . "&quot;\n"
-            . '  namespace ' . CLASS_NAMESPACE . "1 {\n"
-            . '    class ' . NAME . "1:::classDef0 {\n"
-            . "    }\n"
-            . '    class ' . NAME . "2:::classDef2 {\n"
-            . "    }\n"
-            . "  }\n"
-            . '  note for ' . NAME . "2 &quot;Class 2 note&quot;\n"
-            . '  click ' . NAME . "2 href &quot;https://example.com&quot; _self\n"
-            . '  namespace ' . CLASS_NAMESPACE . "2 {\n"
-            . '    class ' . NAME . "3:::classDef1 {\n"
-            . "    }\n"
-            . '    class ' . NAME . "4 {\n"
-            . "    }\n"
-            . "  }\n"
-            . '  note for ' . NAME . "3 &quot;Class 3 note&quot;\n"
-            . '  click ' . NAME . "3 call callback()\n"
-            . '  click ' . NAME . "4 href &quot;https://example.com&quot; _self\n"
-            . '  ' . NAME . '1 --|&gt; ' . NAME . "2\n"
-            . '  ' . NAME . '2 --|&gt; ' . NAME . "3\n"
-            . '  ' . NAME . '2 --|&gt; ' . NAME . "4\n"
-            . '</pre>'
+        ->render()
+    )
+        ->toBe(<<<EXPECTED
+<pre class="mermaid">
+---
+title: Title
+---
+classDiagram
+  note &quot;Note&quot;
+  namespace Namespace1 {
+    class Name1:::classDef0 {
+    }
+    class Name2:::classDef2 {
+    }
+  }
+  note for Name2 &quot;Class 2 note&quot;
+  click Name2 href &quot;https://example.com&quot; _self
+  namespace Namespace2 {
+    class Name3:::classDef1 {
+    }
+    class Name4 {
+    }
+  }
+  note for Name3 &quot;Class 3 note&quot;
+  click Name3 call callback()
+  click Name4 href &quot;https://example.com&quot; _self
+  Name1 --|&gt; Name2
+  Name2 --|&gt; Name3
+  Name2 --|&gt; Name4
+</pre>
+EXPECTED
         )
     ;
 });
 
 dataset('relationshipType', [
-    RelationshipType::Aggregation,
-    RelationshipType::Association,
-    RelationshipType::Composition,
-    RelationshipType::DashedLink,
-    RelationshipType::Dependency,
-    RelationshipType::Inheritance,
-    RelationshipType::Realization,
-    RelationshipType::SolidLink,
+    RelationshipType::aggregation,
+    RelationshipType::association,
+    RelationshipType::composition,
+    RelationshipType::dashedLink,
+    RelationshipType::dependency,
+    RelationshipType::inheritance,
+    RelationshipType::realization,
+    RelationshipType::solidLink,
 ]);

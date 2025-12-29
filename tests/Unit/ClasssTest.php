@@ -1,8 +1,4 @@
 <?php
-/**
- * @copyright Copyright © 2023 BeastBytes - All rights reserved
- * @license BSD 3-Clause
- */
 
 declare(strict_types=1);
 
@@ -37,10 +33,7 @@ test('Simple class', function () {
 });
 
 test('Class with annotation', function () {
-    $class = new Classs(
-        name: NAME,
-        annotation: ANNOTATION
-    );
+    $class = new Classs(name: NAME, annotation: ANNOTATION);
 
     /** @psalm-suppress InternalMethod */
     expect($class->render(''))
@@ -52,28 +45,25 @@ test('Class with annotation', function () {
 });
 
 test('Class with comment', function () {
-    $class = (new Classs(name: NAME))->withComment(COMMENT);
+    $class = new Classs(name: NAME);
 
     /** @psalm-suppress InternalMethod */
-    expect($class->render(''))
+    expect($class->withComment(COMMENT)->render(''))
         ->toBe('%% ' . COMMENT . "\nclass " . NAME . " {\n}")
     ;
 });
 
 test('Class with style', function () {
-    $class = (new Classs(name: NAME))->withStyleClass(STYLE_CLASS);
+    $class = new Classs(name: NAME);
 
     /** @psalm-suppress InternalMethod */
-    expect($class->render(''))
+    expect($class->withStyleClass(STYLE_CLASS)->render(''))
         ->toBe('class ' . NAME . Mermaid::CLASS_OPERATOR . STYLE_CLASS . " {\n}")
     ;
 });
 
 test('Class with label', function () {
-    $class = new Classs(
-        name: NAME,
-        label: LABEL
-    );
+    $class = new Classs(name: NAME, label: LABEL);
 
     /** @psalm-suppress InternalMethod */
     expect($class->render(''))
@@ -82,25 +72,19 @@ test('Class with label', function () {
 });
 
 test('Class with interaction', function () {
-    $class = (new Classs(NAME));
-    $output = [];
+    $class = new Classs(NAME);
 
-    $class->withInteraction('https://example.com')->renderInteraction($output);
-    expect($output[0])
+    expect($class->withInteraction('https://example.com', InteractionType::Link)->renderInteraction())
         ->toBe('  click ' . NAME . ' href "https://example.com" _self')
-    ;
-
-    $class->withInteraction('myCallback()')->renderInteraction($output);
-    expect($output[1])
+        ->and($class->withInteraction('myCallback()', InteractionType::Callback)->renderInteraction())
         ->toBe('  click ' . NAME . ' call myCallback()')
     ;
 });
 
 test('Class with note', function () {
-    $output = [];
+    $class = new Classs(NAME);
 
-    (new Classs(NAME))->withNote(NOTE)->renderNote('', $output);
-    expect($output[0])
+    expect($class->withNote(NOTE)->renderNote(''))
         ->toBe('note for ' . NAME . ' "' . NOTE . '"')
     ;
 });
@@ -110,35 +94,37 @@ test('Class using addMember', function () {
         ->addMember(new Attribute(
             name:       ATTRIBUTE_NAME,
             type:       'string',
-            visibility: Visibility::Private
+            visibility: Visibility::private
         ))
         ->addMember(new Method(
             name:       METHOD_NAME,
             returnType: 'string',
-            visibility: Visibility::Public
+            visibility: Visibility::public
         ))
     ;
 
     /** @psalm-suppress InternalMethod */
     expect($class->render(''))
-        ->toBe('class ' . NAME . " {\n"
-            . '  -string ' . ATTRIBUTE_NAME . "\n"
-            . '  +' . METHOD_NAME . "() string\n"
-            . '}'
+        ->toBe(<<<EXPECTED
+class Name {
+  -string attribute
+  +getAttribute() string
+}
+EXPECTED
         )
     ;
 });
 
 test('Class using withMember', function () {
     $attribute = new Attribute(
-        name:       ATTRIBUTE_NAME,
-        type:       'string',
-        visibility: Visibility::Private
+        name: ATTRIBUTE_NAME,
+        type: 'string',
+        visibility: Visibility::private
     );
     $method = new Method(
-        name:       METHOD_NAME,
+        name: METHOD_NAME,
         returnType: 'string',
-        visibility: Visibility::Public
+        visibility: Visibility::public
     );
 
     $class = (new Classs(name: NAME))
@@ -147,10 +133,12 @@ test('Class using withMember', function () {
 
     /** @psalm-suppress InternalMethod */
     expect($class->render(''))
-        ->toBe('class ' . NAME . " {\n"
-            . '  -string ' . ATTRIBUTE_NAME . "\n"
-            . '  +' . METHOD_NAME . "() string\n"
-            . '}'
+        ->toBe(<<<EXPECTED
+class Name {
+  -string attribute
+  +getAttribute() string
+}
+EXPECTED
         )
     ;
 });
@@ -165,12 +153,12 @@ test('Class with everything', function () {
             new Attribute(
                 name: ATTRIBUTE_NAME,
                 type: 'string',
-                visibility: Visibility::Private
+                visibility: Visibility::private
             ),
             new Method(
                 name: METHOD_NAME,
                 returnType: 'string',
-                visibility: Visibility::Public
+                visibility: Visibility::public
             )
         )
         ->withStyleClass(STYLE_CLASS)
@@ -179,12 +167,14 @@ test('Class with everything', function () {
 
     /** @psalm-suppress InternalMethod */
     expect($class->render(''))
-        ->toBe('%% ' . COMMENT . "\n"
-            . 'class ' . NAME . '["' . LABEL . '"]' . Mermaid::CLASS_OPERATOR . STYLE_CLASS . " {\n"
-            . '  <<' . ANNOTATION . ">>\n"
-            . '  -string ' . ATTRIBUTE_NAME . "\n"
-            . '  +' . METHOD_NAME . "() string\n"
-            . '}'
+        ->toBe(<<<EXPECT
+%% Class comment
+class Name["Label"]:::styleClass {
+  <<Annotation>>
+  -string attribute
+  +getAttribute() string
+}
+EXPECT
         )
     ;
 });

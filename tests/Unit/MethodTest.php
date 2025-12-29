@@ -1,8 +1,4 @@
 <?php
-/**
- * @copyright Copyright © 2023 BeastBytes - All rights reserved
- * @license BSD 3-Clause
- */
 
 declare(strict_types=1);
 
@@ -30,10 +26,10 @@ test('Method with visibility', function (Visibility $visibility) {
     ;
 })
     ->with([
-        Visibility::Public,
-        Visibility::Protected,
-        Visibility::Private,
-        Visibility::Internal
+        Visibility::public,
+        Visibility::protected,
+        Visibility::private,
+        Visibility::internal
    ])
 ;
 
@@ -64,10 +60,10 @@ test('Method with everything', function () {
         name:       NAME,
         parameters: ['string $string', 'bool $bool', 'int $int'],
         returnType: 'string',
-        visibility: Visibility::Public
+        visibility: Visibility::public
     );
 
     expect($method->render(''))
-        ->toBe(Visibility::Public->value . NAME . '(string $string, bool $bool, int $int) string')
+        ->toBe(Visibility::public->value . NAME . '(string $string, bool $bool, int $int) string')
     ;
 });
