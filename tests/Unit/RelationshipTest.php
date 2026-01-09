@@ -6,7 +6,6 @@ use BeastBytes\Mermaid\ClassDiagram\Cardinality;
 use BeastBytes\Mermaid\ClassDiagram\Classs;
 use BeastBytes\Mermaid\ClassDiagram\Relationship;
 use BeastBytes\Mermaid\ClassDiagram\RelationshipType;
-use BeastBytes\Mermaid\Mermaid;
 
 defined('CLASS_A_NAME') or define('CLASS_A_NAME', 'ClassA');
 defined('CLASS_B_NAME') or define('CLASS_B_NAME', 'ClassB');
@@ -19,7 +18,7 @@ test('Simple relationship', function (RelationshipType $type) {
     $relationship = new Relationship($classA, $classB, $type);
 
     expect($relationship->render(''))
-        ->toBe($classA->getName() . ' ' . $type->value . ' ' . $classB->getName())
+        ->toBe('ClassA ' . $type->value . ' ClassB')
     ;
 })
     ->with('relationshipType')
@@ -32,11 +31,7 @@ test('Relationship with label', function () {
     $relationship = new Relationship($classA, $classB, RelationshipType::inheritance, LABEL);
 
     expect($relationship->render(''))
-        ->toBe($classA->getName()
-            . ' ' . RelationshipType::inheritance->value
-            . ' ' . $classB->getName()
-            . ' : ' . LABEL
-        )
+        ->toBe('ClassA --|> ClassB : Label')
     ;
 });
 
@@ -54,11 +49,11 @@ test('Relationship with cardinality', function ($type, $cardinalityA , $cardinal
 );
 
     expect($relationship->render(''))
-        ->toBe($classA->getName()
+        ->toBe($classA->getId()
             . ' "' . $cardinalityA->value . '"'
             . ' ' . $type->value
             . ' "' . $cardinalityB->value . '"'
-            . ' ' . $classB->getName()
+            . ' ' . $classB->getId()
             . ' : ' . LABEL
     );
 })

@@ -123,19 +123,23 @@ test('classDiagram with everything', function () {
             $class2 = (new Classs(name: NAME . '2', namespace: CLASS_NAMESPACE . '1'))
                 ->withStyleClass('classDef2')
                 ->withNote('Class 2 note')
-                ->withInteraction('https://example.com', InteractionType::Link)
+                ->withInteraction('https://example.com', InteractionType::link)
             ,
+        )
+        ->addClass(
             $class3 = (new Classs(name: NAME . '3', namespace: CLASS_NAMESPACE . '2'))
                 ->withStyleClass('classDef1')
                 ->withNote('Class 3 note')
-                ->withInteraction('callback()', InteractionType::Callback)
+                ->withInteraction('callback()', InteractionType::callback)
             ,
             $class4 = (new Classs(name: NAME . '4', namespace: CLASS_NAMESPACE . '2'))
-                ->withInteraction('https://example.com', InteractionType::Link)
+                ->withInteraction('https://example.com', InteractionType::link)
         )
         ->withRelationship(
             new Relationship($class1, $class2, RelationshipType::inheritance),
-            new Relationship($class2, $class3, RelationshipType::inheritance),
+            new Relationship($class2, $class3, RelationshipType::inheritance)
+        )
+        ->addRelationship(
             new Relationship($class2, $class4, RelationshipType::inheritance)
         )
         ->render()

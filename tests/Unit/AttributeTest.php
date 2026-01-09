@@ -21,15 +21,23 @@ test('Attribute with visibility', function (Visibility $visibility) {
     ->with('visibility')
 ;
 
-test('Method with type', function () {
+test('Attribute with type', function () {
     expect((new Attribute(NAME, 'string'))->render(''))
-        ->toBe('string ' . 'Name')
+        ->toBe('string Name')
+    ;
+});
+
+test('Static attribute', function () {
+    expect((new Attribute(NAME, 'string', isStatic: Attribute::IS_STATIC))->render(''))
+        ->toBe('string Name$')
     ;
 });
 
 test('Attribute with everything', function () {
-    expect((new Attribute(NAME, 'string', Visibility::public))->render(''))
-        ->toBe(Visibility::public->value . 'string ' . 'Name')
+    expect((new Attribute(NAME, 'string', Visibility::public, Attribute::IS_STATIC))
+        ->render('')
+    )
+        ->toBe('+string Name$')
     ;
 });
 

@@ -16,17 +16,16 @@ final class ClassDiagram extends Diagram
     use InteractionRendererTrait;
     use RenderItemsTrait;
 
+    private const string NOTE = 'note "%s"';
     private const string TYPE = 'classDiagram';
 
     /**
-     * @psalm-var list<string> $actions
      * @var string[] $actions
      */
     private array $actions = [];
     /** @var array<string, Classs[]> $classes */
     private array $classes = [];
     /**
-     * @psalm-var list<Relationship> $relationships
      * @var Relationship[] $relationships
      */
     private array $relationships = [];
@@ -103,7 +102,7 @@ final class ClassDiagram extends Diagram
     private function renderNote(string $indentation): string
     {
         return is_string($this->note)
-            ? $indentation . 'note "' . $this->note . '"'
+            ? $indentation . sprintf(self::NOTE, $this->note)
             : ''
         ;
     }
@@ -125,7 +124,7 @@ final class ClassDiagram extends Diagram
                 $output[] = Mermaid::INDENTATION . '}';
             }
 
-            $output[] = $this->renderNotes($classes);
+            $output[] = $this->renderClassNotes($classes);
             $output[] = $this->renderInteractions($classes);
         }
 
@@ -134,17 +133,15 @@ final class ClassDiagram extends Diagram
         return implode("\n", array_filter($output, fn($v) => $v !== ''));
     }
 
-    private function renderNotes(array $classes): string
+    private function renderClassNotes(array $classes): string
     {
         $notes = [];
 
         /** @var Classs $class */
         foreach ($classes as $class) {
-            if ($class->hasNote()) {
-                $notes[] = $class->renderNote(Mermaid::INDENTATION);
-            }
+            $notes[] = $class->renderNote(Mermaid::INDENTATION);
         }
 
-        return implode("\n", $notes);
+        return implode("\n", array_filter($notes, fn($v) => !empty($v)));
     }
 }

@@ -21,14 +21,14 @@ final readonly class Relationship
     public function render(string $indentation): string
     {
         return $indentation
-            . $this->classA->getName()
+            . $this->classA->getId()
             . ' '
-            . ($this->cardinalityA === null ? '' : '"' . $this->cardinalityA->value . '" ')
+            . ($this->cardinalityA instanceof Cardinality ? '"' . $this->cardinalityA->value . '" ' : '')
             . $this->type->value
             . ' '
-            . ($this->cardinalityB === null ? '' : '"' . $this->cardinalityB->value . '" ')
-            . $this->classB->getName()
-            . ($this->label === null ? '' : ' : ' . $this->label)
+            . ($this->cardinalityB instanceof Cardinality ? '"' . $this->cardinalityB->value . '" ' : '')
+            . $this->classB->getId()
+            . (is_string($this->label) ? ' : ' . $this->label : '')
         ;
     }
 }
