@@ -23,10 +23,10 @@ ClassDiagram
 
   .. php:method:: render(array $attributes = [])
 
-    Renders a Mermaid chart or diagram
+    Renders the class diagram
 
     :param array $attributes: HTML attributes for the <pre> tag as name=>value pairs
-    .. note:: The `mermaid` class is added
+    .. note:: The *mermaid* class is added
     :returns: Mermaid class diagram code in a <pre> tag
     :rtype: string
 
