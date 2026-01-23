@@ -58,7 +58,7 @@ test('classDiagram with note', function () {
         ->toBe(<<<EXPECTED
 <pre class="mermaid">
 classDiagram
-  note &quot;Note&quot;
+  note "Note"
   class Name {
   }
 </pre>
@@ -150,27 +150,27 @@ test('classDiagram with everything', function () {
 title: Title
 ---
 classDiagram
-  note &quot;Note&quot;
+  note "Note"
   namespace Namespace1 {
     class Name1:::classDef0 {
     }
     class Name2:::classDef2 {
     }
   }
-  note for Name2 &quot;Class 2 note&quot;
-  click Name2 href &quot;https://example.com&quot; _self
+  note for Name2 "Class 2 note"
+  click Name2 href "https://example.com" _self
   namespace Namespace2 {
     class Name3:::classDef1 {
     }
     class Name4 {
     }
   }
-  note for Name3 &quot;Class 3 note&quot;
+  note for Name3 "Class 3 note"
   click Name3 call callback()
-  click Name4 href &quot;https://example.com&quot; _self
-  Name1 --|&gt; Name2
-  Name2 --|&gt; Name3
-  Name2 --|&gt; Name4
+  click Name4 href "https://example.com" _self
+  Name1 --|> Name2
+  Name2 --|> Name3
+  Name2 --|> Name4
 </pre>
 EXPECTED
         )
