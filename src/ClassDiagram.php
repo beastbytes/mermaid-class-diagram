@@ -9,7 +9,11 @@ use BeastBytes\Mermaid\Diagram;
 use BeastBytes\Mermaid\InteractionRendererTrait;
 use BeastBytes\Mermaid\Mermaid;
 use BeastBytes\Mermaid\RenderItemsTrait;
+use \Override;
 
+/**
+ * @psalm-extends Diagram
+ */
 final class ClassDiagram extends Diagram
 {
     use CommentTrait;
@@ -92,6 +96,10 @@ final class ClassDiagram extends Diagram
         return $new;
     }
 
+    /**
+     * @param string $note
+     * @return ClassDiagram
+     */
     public function withNote(string $note): self
     {
         $new = clone $this;
@@ -107,6 +115,7 @@ final class ClassDiagram extends Diagram
         ;
     }
 
+    #[Override]
     protected function renderDiagram(): string
     {
         $output = [];
@@ -133,11 +142,14 @@ final class ClassDiagram extends Diagram
         return implode("\n", array_filter($output, fn($v) => $v !== ''));
     }
 
+    /**
+     * @param Classs[] $classes
+     * @return string
+     */
     private function renderClassNotes(array $classes): string
     {
         $notes = [];
 
-        /** @var Classs $class */
         foreach ($classes as $class) {
             $notes[] = $class->renderNote(Mermaid::INDENTATION);
         }
