@@ -1,1 +1,3 @@
-phpdomain
+furo
+sphinxcontrib.mermaid
+sphinxcontrib.phpdomain
